@@ -31,7 +31,7 @@
 
 body {
   background-color: var(--bg-body);
-  font-family: 'Sarabun', sans-serif;
+  font-family: 'kanit', sans-serif;
   font-size: 14px;
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
