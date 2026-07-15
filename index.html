@@ -1,1 +1,715 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Packing Production System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script>
+if (typeof ChartDataLabels !== 'undefined') {
+    Chart.register(ChartDataLabels);
+}
+</script>
+<!-- เดิมคือ <?!= include('css'); ?> (Apps Script templating) เปลี่ยนเป็น link ธรรมดา -->
+<!-- ⚠️ นำเนื้อหาไฟล์ css.html เดิมมาวางในไฟล์ style.css แล้วอัปโหลดคู่กันไปที่ Netlify -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<div class="container-fluid">
+  <div class="row">
+          <div class="col-md-3 col-xl-2 sidebar d-none d-md-block">
+              <div class="brand-panel">
+                  <div class="brand-top">
+                    <div class="brand-logo">
+                      <i class="fas fa-boxes-stacked"></i>
+                    </div>
+                    <div>
+                      <div class="brand-name">
+                        PACKING SYSTEM
+                      </div>
+                      <div class="brand-desc">
+                        Manufacturing Execution System
+                      </div>
+                    </div>
+                  </div>
+                  <div class="brand-divider"></div>
+                  <div class="brand-version">
+                    <i class="fas fa-circle"></i>
+                    Version 2.0 (Supabase)
+                  </div>
+                </div>
+              <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
+                <p class="nav-group-title">ภาพรวม</p>
+                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-dash" onclick="refreshDashboard()">
+                  <i class="fas fa-chart-pie me-2"></i> แดชบอร์ดสรุปยอด
+                </button>
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-po_sum" id="btn-tab-po_sum">
+                    <i class="fas fa-file-invoice-dollar me-2"></i>ติดตาม PO
+                </button>
+                <p class="nav-group-title">การผลิต</p>
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-sum" id="btn-tab-summary">
+                  <i class="fas fa-file-import me-2"></i> ยอดรับจากหน่วยบรรจุ
+                </button>
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-p6" id="btn-tab-pack6">
+                  <i class="fas fa-box me-2"></i> ยอด Pack 6 ขวด
+                </button>
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-p24" id="btn-tab-pack24">
+                  <i class="fas fa-boxes me-2"></i> ยอด Pack Tray 24 ขวด
+                </button>
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-btl" id="btn-tab-bottles">
+                  <i class="fas fa-bottle-water me-2"></i> ยอดแบบขวดเดี่ยว
+                </button>
+
+                <p class="nav-group-title">คลังสินค้า</p>
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-pkg" id="btn-tab-packaging">
+                  <i class="fas fa-dolly me-2"></i> เบิกจ่ายบรรจุภัณฑ์
+                </button>
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-wip-p" id="btn-tab-wip-product">
+                  <i class="fas fa-spinner me-2"></i> WIP ผลิตภัณฑ์
+                </button>
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-wip-pkg" id="btn-tab-wip-packaging">
+                  <i class="fas fa-hourglass-half me-2"></i> WIP บรรจุภัณฑ์
+                </button>
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-waste" id="btn-tab-waste">
+                  <i class="fas fa-trash-alt me-2"></i> บันทึกของเสีย
+                </button>
+
+                <p class="nav-group-title">อื่นๆ</p>
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-rd" id="btn-tab-rd">
+                  <i class="fas fa-flask me-2"></i> ตัวอย่าง R&D
+                </button>
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-po" id="btn-tab-po">
+                  <i class="fas fa-file-invoice-dollar me-2"></i> PO Customer
+                </button>
+              
+              </div>
+            </div>
+
+    <div class="col-md-9 col-xl-10 p-4">
+      <div class="tab-content" id="v-pills-tabContent">
+        <div class="tab-pane fade show active" id="tab-dash">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="m-0 fw-semibold text-secondary"><i class="fas fa-chart-pie me-2"></i>แดชบอร์ดสรุปยอดรวม</h3>
+            <span class="badge bg-secondary px-3 py-2 fw-light">ข้อมูลอัปเดตแบบเรียลไทม์</span>
+          </div>
+          
+          <div class="row g-3 mb-2">
+                  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-6 g-3 mb-4">
+                            <div class="col">
+                              <div class="metric-card metric-primary h-100">
+                                <div class="metric-header">
+                                  <div>
+                                    <div class="metric-label">จำนวนขวดทั้งหมด</div>
+                                    <div class="metric-value" id="d-total">0</div>
+                                  </div>
+                                  <div class="metric-icon">
+                                    <i class="fas fa-cubes"></i>
+                                  </div>
+                                </div>
+                                <div class="metric-footer">
+                                  <span class="metric-status">
+                                    <i class="fas fa-circle"></i> Real-time
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="metric-card metric-info h-100">
+                                <div class="metric-header">
+                                  <div>
+                                    <div class="metric-label">Pack 6 (ขวด)</div>
+                                    <div class="metric-value" id="d-p6">0</div>
+                                  </div>
+                                  <div class="metric-icon">
+                                    <i class="fas fa-box"></i>
+                                  </div>
+                                </div>
+                                <div class="metric-footer">
+                                  <span class="metric-status">
+                                    <i class="fas fa-circle"></i> Production
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="metric-card metric-success h-100">
+                                <div class="metric-header">
+                                  <div>
+                                    <div class="metric-label">Pack Tray 24 (ถาด)</div>
+                                    <div class="metric-value" id="d-p24">0</div>
+                                  </div>
+                                  <div class="metric-icon">
+                                    <i class="fas fa-boxes"></i>
+                                  </div>
+                                </div>
+                                <div class="metric-footer">
+                                  <span class="metric-status">
+                                    <i class="fas fa-circle"></i> Packaging
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="metric-card metric-danger h-100">
+                                <div class="metric-header">
+                                  <div>
+                                    <div class="metric-label">ของเสียสะสม</div>
+                                    <div class="metric-value" id="d-waste">0</div>
+                                  </div>
+                                  <div class="metric-icon">
+                                    <i class="fas fa-trash-alt"></i>
+                                  </div>
+                                </div>
+                                <div class="metric-footer">
+                                  <span class="metric-status">
+                                    <i class="fas fa-circle"></i> Waste
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="metric-card metric-primary h-100">
+                                <div class="metric-header">
+                                  <div>
+                                    <div class="metric-label">Order ที่มีทั้งหมด</div>
+                                    <div class="metric-value" id="d-orders">0</div>
+                                  </div>
+                                  <div class="metric-icon">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                  </div>
+                                </div>
+                                <div class="metric-footer">
+                                  <span class="metric-status">
+                                    <i class="fas fa-circle"></i> Orders
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="metric-card metric-warning h-100">
+                                <div class="metric-header">
+                                  <div>
+                                    <div class="metric-label">เปอร์เซ็นต์ผลผลิต (%Yield)</div>
+                                    <div class="metric-value" id="d-yield">100.00%</div>
+                                  </div>
+                                  <div class="metric-icon" id="yield-iconbox">
+                                    <i class="fas fa-chart-pie"></i>
+                                  </div>
+                                </div>
+                                <div class="metric-footer">
+                                  <span class="metric-status">
+                                    <i class="fas fa-circle"></i> Efficiency
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          <div class="col-12 col-md-6 col-xl-3">
+                                  <div class="po-kpi po-kpi-info">
+                                    <div class="po-kpi-header">
+                                      <span>ความคืบหน้ารวม</span>
+                                      <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <div class="po-kpi-value" id="po-progress-total"> 0%</div>
+                                    <div style="font-size:10px;opacity:.8;">----------</div>
+                                  </div>
+                           </div>
+                           <div class="col-12 col-md-6 col-xl-3">
+                              <div class="po-kpi po-kpi-info">
+                                <div class="po-kpi-header">
+                                  <span>🔥 ผลิตล่าสุด</span>
+                                  <i class="fas fa-industry"></i>
+                                </div>
+                                <div class="po-kpi-value"id="latest-production">0</div>
+                                <div id="latest-production-date" style="font-size:10px;opacity:.8;">-</div>
+                              </div>
+                           </div>
+                  </div>   
+          </div>
+            <div class="row g-3 mb-4">
+              <div class="col-lg-5">
+                <div class="card shadow-sm border-0 h-100">
+                  <div class="card-header bg-white">
+                                  <h5 class="m-0 fw-bold">
+                                    🏆 Top 5 Order ใกล้ครบ
+                                  </h5>
+                                </div>
+                                <div class="card-body" id="top5-po-list">
+                                  <div class="text-center text-muted py-3">
+                                    กำลังโหลด...
+                                  </div>
+                                </div>
+                </div>
+              </div>
+              <div class="col-lg-7">
+                <div class="card shadow-sm border-0 h-100">
+                      <div class="card-header bg-white">
+                        <h5 class="m-0 fw-bold">
+                          🚨 Order ต้องติดตาม
+                        </h5>
+                      </div>
+                      <div class="card-body" id="alert-po-list">
+                        <div class="text-center text-muted py-3">
+                          กำลังโหลด...
+                        </div>
+                      </div>
+                    </div>
+              </div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-header">
+                  <div>
+                    <h5>📈 ผลผลิตย้อนหลัง 7 วัน</h5>
+                    <small>เป้าหมาย 20,000 ขวด/วัน</small>
+                  </div>
+                  <div style="text-align:right">
+                        <div id="avg-production"
+                            style="font-size:20px;font-weight:700;color:#2563eb">
+                          0
+                        </div>
+                        <small style="color:#64748b">
+                          เฉลี่ย/วัน
+                        </small>
+                      </div>
+                </div>
+                <canvas id="production7DayChart" height="120"></canvas>
+              </div>
+           <div style="margin-bottom:15px;"></div>
+              <div class="card shadow-sm p-4" style="position: relative; width: 100%; min-height: 350px;">
+                            <h5 class="mb-4">📊 สรุปยอดผลิตราย Brand</h5>
+                            <canvas id="poChart" height="300"></canvas>
+              </div>
+          </div>  
+       <div class="tab-pane fade" id="tab-po_sum">
+           <div class="card p-4">
+            <h5 class="m-0 fw-medium text-primary"><i class="fas fa-list-check me-2"></i>ตารางติดตามสถานะ PO <span class="text-muted fs-6 font-monospace">(สั่งซื้อ - แพ็คได้จริง)</span></h5>
+                      <div class="po-filter-bar">
+                              <div class="filter-icon">
+                                <i class="fas fa-filter"></i>
+                              </div>
+                              <select id="po-search"class="form-select"onchange="filterPOTable()">
+                                <option value="">ทุก PO</option>
+                              </select>
+                              <select id="po-filter-status"class="form-select"onchange="filterPOTable()">
+                                <option value="">ทุกสถานะ</option>
+                                <option value="ยังไม่เริ่ม">🔴 ยังไม่เริ่ม</option>
+                                <option value="กำลังผลิต">🟡 กำลังผลิต</option>
+                                <option value="ใกล้ครบ">🟠 ใกล้ครบ</option>
+                                <option value="ครบแล้ว">🟢 ครบแล้ว</option>
+                              </select>
+                              <button class="btn-refresh"onclick="loadPOTracking()">
+                                <i class="fas fa-rotate-right"></i>
+                              </button>
+                      </div>
+                                <div class="row g-3 mb-4" id="po-summary-cards">
+                                  <div class="col-12 col-md-6 col-xl-3">
+                                    <div class="po-kpi po-kpi-primary">
+                                      <div class="po-kpi-header">
+                                        <span>PO ทั้งหมด</span>
+                                        <i class="fas fa-file-invoice"></i>
+                                      </div>
+                                      <div class="po-kpi-value" id="po-total-count">0</div>
+                                    </div>
+                                  </div>
+
+                                  <div class="col-12 col-md-6 col-xl-3">
+                                    <div class="po-kpi po-kpi-success">
+                                      <div class="po-kpi-header">
+                                        <span>ครบแล้ว</span>
+                                        <i class="fas fa-circle-check"></i>
+                                      </div>
+                                      <div class="po-kpi-value" id="po-done">0</div>
+                                    </div>
+                                  </div>
+
+                                  <div class="col-12 col-md-6 col-xl-3">
+                                    <div class="po-kpi po-kpi-warning">
+                                      <div class="po-kpi-header">
+                                        <span>กำลังผลิต</span>
+                                        <i class="fas fa-gears"></i>
+                                      </div>
+                                      <div class="po-kpi-value" id="po-inprog">0</div>
+                                    </div>
+                                  </div>
+
+                                  <div class="col-12 col-md-6 col-xl-3">
+                                    <div class="po-kpi po-kpi-danger">
+                                      <div class="po-kpi-header">
+                                        <span>ยังไม่เริ่ม</span>
+                                        <i class="fas fa-hourglass-start"></i>
+                                      </div>
+                                      <div class="po-kpi-value" id="po-notstart">0</div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                        <div class="po-kpi po-kpi-primary">
+                          <table class="table table-hover mb-0" id="po-table">
+                            <thead>
+                              <tr>
+                                <th>Brand</th>
+                                <th>PO</th>
+                                <th>ผลิตภัณฑ์</th>
+                                <th style="text-align:right">ยอดสั่ง(TRAY)</th>
+                                <th style="text-align:right">แพ็คได้จริง(TRAY)</th>
+                                <th style="text-align:right">คงเหลือ</th>
+                                <th style="text-align:center">% สำเร็จ</th>
+                                <th style="text-align:center">สถานะ</th>
+                                <th>TFC Code</th>
+                              </tr>
+                            </thead>
+                            <tbody id="po-body"></tbody>
+                          </table>
+                        </div>
+         
+        </div>
+       </div>
+        <div class="tab-pane fade" id="tab-sum">
+           <div class="card p-4">
+             <h5 class="mb-4 text-dark fw-medium"><i class="fas fa-file-import me-2 text-primary"></i>บันทึกยอดรวมทั้งหมดที่รับมาจากหน่วยบรรจุ</h5>
+             <form id="f-Summary" class="row g-3"><input type="hidden" name="rowNum">
+                <input type="hidden" name="ID">
+                <div class="col-md-3"><label class="form-label">วันที่</label><input type="date" name="วันที่" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">ผลิตภัณฑ์</label>
+                <select name="ผลิตภัณฑ์" class="form-select product-dropdown-select" required>
+                  <option value="">-- กำลังโหลดรายการผลิตภัณฑ์... --</option>
+                </select></div>
+                <div class="col-md-3"><label class="form-label">Order</label>
+                <select name="Order" class="form-select po-dropdown-select" required>
+                    <option value="">-- กำลังโหลดรายการ PO... --</option>
+                </select></div>
+                <div class="col-md-3"><label class="form-label">จำนวนขวดที่รับมา</label><input type="number" name="จำนวนขวดที่รับมา" class="form-control" required></div>
+                <div class="col-12 mt-4"><button type="button" class="btn btn-primary px-4" onclick="handleSave('Summary')">บันทึกข้อมูล</button></div>
+             </form>
+           </div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่</th><th>ผลิตภัณฑ์</th><th>Order</th><th>จำนวนขวด</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Summary"></tbody></table></div></div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-p6">
+           <div class="card p-4">
+             <h5 class="mb-4 text-dark fw-medium"><i class="fas fa-box me-2 text-primary"></i>ยอดที่เป็น pack 6 ขวด</h5>
+             <form id="f-Pack6" class="row g-3"><input type="hidden" name="rowNum"><input type="hidden" name="ID">
+                <div class="col-md-3"><label class="form-label">วันที่ผลิต</label><input type="date" name="วันที่ผลิต" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">วันที่หมดอายุ</label><input type="date" name="วันที่หมดอายุ" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">Batch</label><input type="text" name="Batch" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">จำนวน (Pack)</label><input type="number" name="จำนวน" class="form-control" required></div>
+                <div class="col-md-6"><label class="form-label">ผลิตภัณฑ์</label> 
+                <select name="ผลิตภัณฑ์" class="form-select product-dropdown-select" required>
+                  <option value="">-- กำลังโหลดรายการผลิตภัณฑ์... --</option>
+                </select></div>
+                <div class="col-md-6"><label class="form-label">Order</label>
+                <select name="Order" class="form-select po-dropdown-select" required>
+                    <option value="">-- กำลังโหลดรายการ PO... --</option>
+                </select></div>
+                <div class="col-12 mt-4"><button type="button" class="btn btn-primary px-4" onclick="handleSave('Pack6')">บันทึกข้อมูล</button></div>
+             </form>
+           </div>
+
+                          <div class="search-card">
+                            <div class="search-icon">
+                              <i class="fas fa-search"></i>
+                            </div>
+                            <div class="search-content">
+                              <label class="search-label">
+                                ค้นหาตาม Order
+                              </label>
+                              <select id="search-pack6-order"class="form-select search-select"onchange="searchPack6()">
+                                <option value="">-- ทุก Order --</option>
+                              </select>
+                            </div>
+                            <button class="btn-reset"onclick="resetSearchPack6()"title="ล้างการค้นหา">
+                              <i class="fas fa-rotate-left"></i>
+                            </button>
+                          </div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Pack6"></tbody></table></div></div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-p24">
+           <div class="card p-4">
+             <h5 class="mb-4 text-dark fw-medium"><i class="fas fa-boxes me-2 text-primary"></i>ยอดที่เป็น pack tray 24 ขวด</h5>
+             <form id="f-Pack24" class="row g-3"><input type="hidden" name="rowNum"><input type="hidden" name="ID">
+                <div class="col-md-3"><label class="form-label">วันที่ผลิต</label><input type="date" name="วันที่ผลิต" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">วันที่หมดอายุ</label><input type="date" name="วันที่หมดอายุ" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">Batch</label><input type="text" name="Batch" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">จำนวน (Tray)</label><input type="number" name="จำนวน" class="form-control" required></div>
+                <div class="col-md-6"><label class="form-label">ผลิตภัณฑ์</label> 
+                <select name="ผลิตภัณฑ์" class="form-select product-dropdown-select" required>
+                  <option value="">-- กำลังโหลดรายการผลิตภัณฑ์... --</option>
+                </select></div>
+                <div class="col-md-6"><label class="form-label">Order</label> 
+                <select name="Order" class="form-select po-dropdown-select" required>
+                    <option value="">-- กำลังโหลดรายการ PO... --</option>
+                </select></div>
+                <div class="col-12 mt-4"><button type="button" class="btn btn-primary" onclick="handleSave('Pack24')">บันทึกข้อมูล</button></div>
+             </form>
+           </div>
+                      <div class="search-card">
+                        <div class="search-icon"><i class="fas fa-search"></i></div>
+                        <div class="search-content">
+                          <label class="search-label">ค้นหาตาม Order</label>
+                          <select id="search-pack24-order"class="form-select search-select"onchange="searchPack24()">
+                            <option value="">-- ทุก Order --</option>
+                          </select>
+                        </div>
+                        <button class="btn-reset"onclick="resetSearchPack24()"title="ล้างการค้นหา">
+                              <i class="fas fa-rotate-left"></i>
+                            </button>
+                      </div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Pack24"></tbody></table></div></div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-btl">
+           <div class="card p-4">
+             <h5 class="mb-4 text-dark fw-medium"><i class="fas fa-bottle-water me-2 text-primary"></i>ยอดที่เป็นขวดเดี่ยว</h5>
+             <form id="f-Bottles" class="row g-3"><input type="hidden" name="rowNum"><input type="hidden" name="ID">
+                <div class="col-md-3"><label class="form-label">วันที่ผลิต</label><input type="date" name="วันที่ผลิต" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">วันที่หมดอายุ</label><input type="date" name="วันที่หมดอายุ" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">Batch</label><input type="text" name="Batch" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">จำนวน (ขวด)</label><input type="number" name="จำนวน" class="form-control" required></div>
+                <div class="col-md-6"><label class="form-label">ผลิตภัณฑ์</label>
+                 <select name="ผลิตภัณฑ์" class="form-select product-dropdown-select" required>
+                  <option value="">-- กำลังโหลดรายการผลิตภัณฑ์... --</option>
+                </select></div>
+                <div class="col-md-6"><label class="form-label">Order</label> 
+                <select name="Order" class="form-select po-dropdown-select" required>
+                    <option value="">-- กำลังโหลดรายการ PO... --</option>
+                </select></div>
+                <div class="col-12 mt-4"><button type="button" class="btn btn-primary" onclick="handleSave('Bottles')">บันทึกข้อมูล</button></div>
+             </form>
+           </div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Bottles"></tbody></table></div></div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-pkg">
+           <div class="card p-4">
+             <h5 class="mb-4 text-dark fw-medium"><i class="fas fa-dolly me-2 text-primary"></i>เบิกจ่ายบรรจุภัณฑ์</h5>
+           <form id="f-Packaging_Stock" class="row g-3">
+                  <input type="hidden" name="rowNum"><input type="hidden" name="ID">
+                  <div class="col-md-4">
+                    <label class="form-label">หัวข้อหลักบรรจุภัณฑ์</label>
+                    <select name="ประเภทบรรจุภัณฑ์" id="pkg-main-select" class="form-select" required>
+                          <option value="">-- เลือกหัวข้อหลัก --</option>
+                          <option value="tray">Tray</option>
+                          <option value="PE">PE</option>
+                          <option value="carton">Carton</option>
+                          <option value="ฉลาก">ฉลาก</option>
+                          <option value="ชิ้นคอ">ชิ้นคอ</option>
+                          <option value="ซอง Ecolean">ซอง Ecolean</option>
+                          <option value="ฝา">ฝา</option>
+                          <option value="ขวด">ขวด</option>
+                        </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">รายการย่อย</label>
+                    <select name="รายการ" id="pkg-sub-select" class="form-select" required>
+                      <option value="">-- เลือกรายการย่อย --</option>
+                    </select>
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">จำนวน</label>
+                    <input type="number" name="จำนวน" class="form-control" required>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">วันที่</label>
+                    <input type="date" name="วันที่" class="form-control" required>
+                  </div>
+                  <div class="col-12 mt-4">
+                    <button type="button" class="btn btn-primary" onclick="handleSave('Packaging_Stock')">บันทึกการเบิกจ่าย</button>
+                  </div>
+                </form>
+           </div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>ประเภทบรรจุภัณฑ์</th><th>รายการย่อย</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Packaging_Stock"></tbody></table></div></div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-wip-p">
+           <div class="card p-4">
+             <h5 class="mb-4 text-dark fw-medium"><i class="fas fa-spinner me-2 text-primary"></i>6. งานระหว่างทำของผลิตภัณฑ์ (WIP Product)</h5>
+             <form id="f-WIP_Product" class="row g-3"><input type="hidden" name="rowNum"><input type="hidden" name="ID">
+                <div class="col-md-4"><label class="form-label">วันที่ผลิต</label><input type="date" name="วันที่ผลิต" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">วันที่หมดอายุ</label><input type="date" name="วันที่หมดอายุ" class="form-control" required></div>
+                <div class="col-md-4"><label class="form-label">Batch</label><input type="text" name="Batch" class="form-control" required></div>
+                <div class="col-md-4"><label class="form-label">จำนวนขวด</label><input type="number" name="จำนวน" class="form-control" required></div>
+                <div class="col-md-6"><label class="form-label">ผลิตภัณฑ์</label>
+                 <select name="ผลิตภัณฑ์" class="form-select product-dropdown-select" required>
+                  <option value="">-- กำลังโหลดรายการผลิตภัณฑ์... --</option>
+                </select></div>
+                <div class="col-md-6"><label class="form-label">Order</label> 
+                <select name="Order" class="form-select po-dropdown-select" required>
+                    <option value="">-- กำลังโหลดรายการ PO... --</option>
+                </select></div>
+                <div class="col-12 mt-4"><button type="button" class="btn btn-primary" onclick="handleSave('WIP_Product')">บันทึกข้อมูล WIP</button></div>
+             </form>
+           </div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead>
+                <tr>
+                  <th>ID</th>
+                  <th>วันที่ผลิต</th>
+                  <th>วันที่หมดอายุ</th> 
+                  <th>Batch</th>
+                  <th>จำนวน</th>
+                  <th>ผลิตภัณฑ์</th>
+                  <th>Order</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead><tbody id="t-WIP_Product"></tbody></table></div></div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-wip-pkg">
+           <div class="card p-4">
+             <h5 class="mb-4 text-dark fw-medium"><i class="fas fa-hourglass-half me-2 text-primary"></i>งานระหว่างทำของบรรจุภัณฑ์ (WIP Packaging)</h5>
+             <form id="f-WIP_Packaging" class="row g-3"><input type="hidden" name="rowNum"><input type="hidden" name="ID">
+                <div class="col-md-4"><label class="form-label">หัวข้อหลักบรรจุภัณฑ์</label>
+                <select name="ประเภทบรรจุภัณฑ์" id="pkg-main-select-wip" class="form-select" required>
+                          <option value="">-- เลือกหัวข้อหลัก --</option>
+                          <option value="tray">Tray</option>
+                          <option value="PE">PE</option>
+                          <option value="carton">Carton</option>
+                          <option value="ฉลาก">ฉลาก</option>
+                          <option value="ชิ้นคอ">ชิ้นคอ</option>
+                </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">รายการย่อย</label>
+                    <select name="รายการ" id="pkg-sub-select-wip" class="form-select" required>
+                      <option value="">-- เลือกรายการย่อย --</option>
+                    </select>
+                  </div>
+                <div class="col-md-2"><label class="form-label">จำนวน</label><input type="number" name="จำนวน" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">วันที่</label><input type="date" name="วันที่" class="form-control" required></div>
+                <div class="col-12 mt-4"><button type="button" class="btn btn-primary" onclick="handleSave('WIP_Packaging')">บันทึก WIP บรรจุภัณฑ์</button></div>
+             </form>
+           </div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>ประเภทบรรจุภัณฑ์</th><th>รายการ</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-WIP_Packaging"></tbody></table></div></div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-waste">
+           <div class="card p-4">
+             <h5 class="mb-4 text-dark fw-medium"><i class="fas fa-trash-alt me-2 text-danger"></i>ของเสีย</h5>
+             <form id="f-Waste" class="row g-3"><input type="hidden" name="rowNum"><input type="hidden" name="ID">
+                <div class="col-md-3">
+                  <label class="form-label">หัวข้อหลักบรรจุภัณฑ์/ของเสีย</label>
+                  <select name="ประเภทของเสีย" class="form-select" required>
+                     <option value="tray">tray</option>
+                     <option value="PE">PE</option>
+                     <option value="carton">carton</option>
+                     <option value="ฉลาก">ฉลาก</option>
+                     <option value="ชิ้นคอ">ชิ้นคอ</option>
+                     <option value="ขวดแตก">ขวดแตก</option>
+                     <option value="น้ำซึม">น้ำซึม</option>
+                     <option value="ฝาบิล">ฝาบิล</option>
+                     <option value="ขวดสกปรก">ขวดสกปรก</option>
+                     <option value="ปริมาณน้อย">ปริมาณน้อย</option>
+                  </select>
+                </div>
+                <div class="col-md-3"><label class="form-label">หัวข้อสาเหตุ/หมายเหตุ</label><input type="text" name="หัวข้อ" class="form-control" placeholder="สาเหตุเพิ่มเติม" required></div>
+                <div class="col-md-3"><label class="form-label">ผลิตภัณฑ์</label> 
+                <select name="ผลิตภัณฑ์" class="form-select product-dropdown-select" required>
+                  <option value="">-- กำลังโหลดรายการผลิตภัณฑ์... --</option>
+                </select></div>
+                <div class="col-md-3"><label class="form-label">Order</label> 
+                <select name="Order" class="form-select po-dropdown-select" required>
+                    <option value="">-- กำลังโหลดรายการ PO... --</option>
+                </select></div>
+                <div class="col-md-2"><label class="form-label">จำนวน</label><input type="number" name="จำนวน" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">วันที่</label><input type="date" name="วันที่" class="form-control" required></div>
+                <div class="col-12 mt-4"><button type="button" class="btn btn-danger px-4" onclick="handleSave('Waste')">บันทึกข้อมูลของเสีย</button></div>
+             </form>
+           </div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>หัวข้อหลัก</th><th>สาเหตุ</th><th>ผลิตภัณฑ์</th><th>Order</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Waste"></tbody></table></div></div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-rd">
+           <div class="card p-4">
+             <h5 class="mb-4 text-dark fw-medium"><i class="fas fa-flask me-2 text-primary"></i>ตัวอย่าง R&D</h5>
+             <form id="f-RD_Sample" class="row g-3"><input type="hidden" name="rowNum"><input type="hidden" name="ID">
+                <div class="col-md-3"><label class="form-label">วันที่ผลิต</label><input type="date" name="วันที่ผลิต" class="form-control" required></div>
+               <div class="col-md-3">
+                    <label class="form-label">วันที่หมดอายุ</label>
+                    <input type="date" name="วันที่หมดอายุ" class="form-control" required>
+                  </div>
+                <div class="col-md-3"><label class="form-label">Batch</label><input type="text" name="Batch" class="form-control" required></div>
+                <div class="col-md-3"><label class="form-label">จำนวนขวด</label><input type="number" name="จำนวน" class="form-control" required></div>
+                <div class="col-md-6"><label class="form-label">ผลิตภัณฑ์</label> 
+                <select name="ผลิตภัณฑ์" class="form-select product-dropdown-select" required>
+                  <option value="">-- กำลังโหลดรายการผลิตภัณฑ์... --</option>
+                </select></div>
+                <div class="col-md-6"><label class="form-label">Order</label>
+                 <select name="Order" class="form-select po-dropdown-select" required>
+                    <option value="">-- กำลังโหลดรายการ PO... --</option>
+                </select></div>
+                <div class="col-12 mt-4"><button type="button" class="btn btn-primary px-4" onclick="handleSave('RD_Sample')">บันทึกตัวอย่าง R&D</button></div>
+             </form>
+           </div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table">
+                     <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>วันที่ผลิต</th>
+                            <th>วันที่หมดอายุ</th> <th>Batch</th>
+                            <th>จำนวน</th>
+                            <th>ผลิตภัณฑ์</th>
+                            <th>Order</th>
+                            <th class="text-center">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody id="t-RD_Sample"></tbody>
+              </table></div></div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-po">
+           <div class="card p-4">
+             <h5 class="mb-4 text-dark fw-medium"><i class="fas fa-file-invoice-dollar me-2 text-primary"></i>จัดการ PO Customer (ใบสั่งซื้อของลูกค้า)</h5>
+             <form id="f-PO_Customer" class="row g-3"><input type="hidden" name="rowNum"><input type="hidden" name="ID">
+                <div class="col-md-3"><label class="form-label">Brand</label><input type="text" name="Brand" class="form-control" placeholder="ชื่อแบรนด์ลูกค้า" required></div>
+                <div class="col-md-3"><label class="form-label">PO Number</label><input type="text" name="PO" class="form-control" placeholder="เลขที่ PO" required></div>
+                <div class="col-md-4"><label class="form-label">ผลิตภัณฑ์</label>
+                  <select name="ผลิตภัณฑ์" class="form-select" required>
+                    <option value="">-- เลือกผลิตภัณฑ์ --</option>
+                    <option value="OR">OR</option>
+                    <option value="CM">CM</option>
+                    <option value="MG">MG</option>
+                    <option value="BN">BN</option>
+                    <option value="CN">CN</option>
+                    <option value="BK">BK</option>
+                    <option value="LOWSugar">LOWSugar</option>
+                    <option value="GT">GT</option>
+                  </select>
+                </div>
+                <div class="col-md-2"><label class="form-label">ยอดรวม (Tray)</label>
+                <input type="number" name="ยอดรวม" class="form-control" placeholder="จำนวนถาด" required>
+                </div>
+               <div class="col-md-3"><label class="form-label">ID TFC</label><input type="text" name="TfcCode" class="form-control" placeholder="เลขที่ TfcCode" required></div>
+                <div class="col-12 mt-4"><button type="button" class="btn btn-primary px-4" onclick="handleSave('PO_Customer')">บันทึกข้อมูล PO</button></div>
+             </form>
+           </div>
+           <div class="card p-3">
+                    <div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table">
+                        <thead>
+                          <tr><th>ID</th><th>Brand</th><th>PO</th><th>ผลิตภัณฑ์</th><th>ยอดรวม (Tray)</th><th>TfcCode</th><th class="text-center">Actions</th></tr>
+                        </thead>
+                        <tbody id="t-PO_Customer"></tbody>
+                      </table>
+                    </div>
+           </div>
+       </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- เดิมคือ <?!= include('script'); ?> เปลี่ยนเป็น script tag ตรงๆ -->
+<!-- ⚠️ ต้องโหลด supabase-api.js ก่อน script.js เสมอ (ลำดับสำคัญ) -->
+<script src="supabase-api.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
