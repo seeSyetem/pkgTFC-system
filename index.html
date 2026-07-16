@@ -890,15 +890,6 @@ document.addEventListener('shown.bs.tab', function (e) {
   });
 });
 
-// ลงทะเบียน Service Worker เพื่อให้ติดตั้งเป็น PWA และเปิดได้แบบ offline-shell
-/*if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js').catch(function (err) {
-      console.warn('SW registration failed:', err);
-    });
-  });
-}*/
-
 // 📱 บังคับปิดเมนู offcanvas ทุกครั้งที่กดเมนูย่อย (กันปัญหา data-bs-toggle + data-bs-dismiss ชนกัน)
 document.addEventListener('DOMContentLoaded', function () {
   const mobileMenuEl = document.getElementById('mobileMenu');
