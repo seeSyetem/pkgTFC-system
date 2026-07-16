@@ -139,13 +139,19 @@ BackendAPI.getSheetRawData = async function(sheetName) {
 };
 
 BackendAPI.getDashboardData = async function() {
-  const res = { grandTotal: 0, pack6: 0, pack24: 0, totalOrders: 0 };
+  const res = { grandTotal: 0, pack6: 0, pack24: 0, totalOrders: 0, _debug: [] };
   const po = await getTableData("po_customer", "select=id");
-  if (po && !po.error) res.totalOrders = po.length;
+  if (po && !po.error) { res.totalOrders = po.length; res._debug.push("po_customer: " + po.length + " แถว"); }
+  else res._debug.push("po_customer ERROR: " + (po && po.message));
+
   const p6 = await getTableData("pack6", "select=จำนวน");
-  if (p6 && !p6.error) p6.forEach(r => res.pack6 += parseFloat(r["จำนวน"]) || 0);
+  if (p6 && !p6.error) { p6.forEach(r => res.pack6 += parseFloat(r["จำนวน"]) || 0); res._debug.push("pack6: " + p6.length + " แถว, รวม=" + res.pack6); }
+  else res._debug.push("pack6 ERROR: " + (p6 && p6.message));
+
   const p24 = await getTableData("pack24", "select=จำนวน");
-  if (p24 && !p24.error) p24.forEach(r => res.pack24 += parseFloat(r["จำนวน"]) || 0);
+  if (p24 && !p24.error) { p24.forEach(r => res.pack24 += parseFloat(r["จำนวน"]) || 0); res._debug.push("pack24: " + p24.length + " แถว, รวม=" + res.pack24); }
+  else res._debug.push("pack24 ERROR: " + (p24 && p24.message));
+
   res.grandTotal = (res.pack6 * 6) + (res.pack24 * 24);
   return res;
 };
