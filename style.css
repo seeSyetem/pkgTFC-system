@@ -1164,7 +1164,10 @@ body {
   border-left: 3px solid var(--accent-color);
   padding-left: 15px;
 }
-
+.mobile-offcanvas .btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%) !important;
+  opacity: 1 !important;
+}
 /* --- Bottom nav --- */
 .mobile-bottom-nav {
   position: fixed;
