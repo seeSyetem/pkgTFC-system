@@ -829,7 +829,6 @@ document.addEventListener('shown.bs.tab', function (e) {
     el.classList.toggle('active', el.getAttribute('data-bs-target') === targetId);
   });
 });
-
 // ลงทะเบียน Service Worker เพื่อให้ติดตั้งเป็น PWA และเปิดได้แบบ offline-shell
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
@@ -838,6 +837,17 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+  document.addEventListener('DOMContentLoaded', function () {
+  const mobileMenuEl = document.getElementById('mobileMenu');
+  if (mobileMenuEl) {
+    mobileMenuEl.querySelectorAll('.nav-link').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const instance = bootstrap.Offcanvas.getInstance(mobileMenuEl) || new bootstrap.Offcanvas(mobileMenuEl);
+        instance.hide();
+      });
+    });
+  }
+});
 </script>
 </body>
 </html>
