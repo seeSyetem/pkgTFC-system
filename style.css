@@ -458,6 +458,13 @@ body {
 .modal-footer { border-top: 1px solid var(--border-color); padding: 12px 20px; }
 .btn-close { filter: none !important; opacity: 0.5; }
 
+/* ปุ่มปิดกากบาท (X) ในเมนู offcanvas มือถือ ให้เป็นสีขาว
+   (กฎ .btn-close ด้านบนบังคับ filter:none !important ไว้ ต้องทับเฉพาะจุดนี้) */
+.mobile-offcanvas .btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%) !important;
+  opacity: 1 !important;
+}
+
 /* ==================== Badge ==================== */
 #content-area .badge {
   font-size: 11px;
