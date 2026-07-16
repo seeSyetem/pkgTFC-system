@@ -27,13 +27,7 @@ if (typeof ChartDataLabels !== 'undefined') {
     Chart.register(ChartDataLabels);
 }
 </script>
-<!-- เดิมคือ <?!= include('css'); ?> (Apps Script templating) เปลี่ยนเป็น link ธรรมดา -->
-<!-- ⚠️ นำเนื้อหาไฟล์ css.html เดิมมาวางในไฟล์ style.css แล้วอัปโหลดคู่กันไปที่ Netlify -->
 <link rel="stylesheet" href="style.css">
-<!-- 📱 ทำให้ตารางเลื่อนซ้าย-ขวาได้บนมือถือ เมื่อคอลัมน์เยอะเกินความกว้างจอ -->
-<!-- ⚠️ ใช้ class ใหม่แยกต่างหาก (.table-scroll-wrap) แทนการแก้ .po-kpi-primary ตรงๆ -->
-<!-- เพราะ .po-kpi-primary ถูกใช้ร่วมกับการ์ด KPI สรุปยอดด้วย (ซึ่งต้องการ overflow:hidden ไว้เดิม) -->
-<!-- ใส่ !important เพื่อการันตีว่า overflow:hidden จาก .po-kpi ใน style.css จะไม่ทับ -->
 <style>
 .table-scroll-wrap {
   overflow-x: auto !important;
