@@ -1,84 +1,35 @@
-// sw.js — cache เฉพาะ shell ของแอป (ไม่ cache ข้อมูล Supabase)
-const CACHE_NAME = "packing-app-shell-v3";
-const APP_SHELL = [
-  "./",
-  "./index.html",
-  "./style.css",
-  "./script.js",
-  "./supabase-api.js",
-  "./manifest.json",
-  "./icon-192.png",
-  "./icon-512.png"
-];
+// sw.js — เวอร์ชันนี้ทำหน้าที่ "ปลดระวาง" Service Worker เดิมทั้งหมด
+// เพื่อกำจัดปัญหาหน้าเว็บโหลดจาก cache เก่าค้าง (v3 เดิมที่ทำ cache-first)
+// เมื่อไฟล์นี้ถูกติดตั้งแทนที่ตัวเก่า มันจะ:
+//   1. ลบ cache เก่าทุกตัวทิ้ง
+//   2. ยกเลิกการลงทะเบียนตัวเอง (unregister)
+//   3. บังคับให้ทุกหน้าเว็บที่เปิดอยู่ (clients) โหลดใหม่ครั้งเดียว
+//      เพื่อให้หลุดจากการควบคุมของ Service Worker ไปตลอด
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
-  );
+  // ข้ามขั้นตอนรอ ให้ตัวใหม่นี้ทำงานทันที แทนที่ตัวเก่า
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
-});
+    (async () => {
+      // 1) ลบ cache ทั้งหมดที่เคยสร้างไว้
+      const keys = await caches.keys();
+      await Promise.all(keys.map((key) => caches.delete(key)));
 
-self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
+      // 2) เข้าคุมทุกหน้าเว็บที่เปิดอยู่ชั่วคราว (จำเป็นต้องทำก่อน unregister)
+      await self.clients.claim();
 
-  // อย่า cache request ไปหา Supabase — ต้องเป็นข้อมูลสดเสมอ
-  if (url.hostname.includes("supabase.co")) {
-    return;
-  }
+      // 3) ยกเลิกการลงทะเบียนตัวเอง — จากนี้ไปเบราว์เซอร์จะไม่มี SW คุมหน้าเว็บนี้อีก
+      await self.registration.unregister();
 
-  // เฉพาะ same-origin GET requests เท่านั้นที่ทำ cache-first
-  if (event.request.method !== "GET" || url.origin !== self.location.origin) {
-    return;
-  }
-
-  // สำหรับหน้า HTML/navigation ใช้ network-first เสมอ กัน cache เก่า/เสียค้างซ้ำตอน refresh
-  const isNavigation =
-    event.request.mode === "navigate" ||
-    (event.request.headers.get("accept") || "").includes("text/html");
-
-  if (isNavigation) {
-    event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME)
-            .then((cache) => cache.put(event.request, responseClone))
-            .catch((err) => console.warn("SW: cache put failed", err));
-          return networkResponse;
-        })
-        .catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const fetchPromise = fetch(event.request)
-        .then((networkResponse) => {
-          // clone ทันทีก่อนทำอะไรอื่น กัน error "body already used"
-          let responseClone;
-          try {
-            responseClone = networkResponse.clone();
-          } catch (err) {
-            console.warn("SW: clone response failed", err);
-            return networkResponse;
-          }
-          caches.open(CACHE_NAME)
-            .then((cache) => cache.put(event.request, responseClone))
-            .catch((err) => console.warn("SW: cache put failed", err));
-          return networkResponse;
-        })
-        .catch(() => cached);
-      return cached || fetchPromise;
-    })
+      // 4) สั่งให้ทุกแท็บที่เปิดเว็บนี้อยู่ reload ใหม่หนึ่งครั้ง
+      //    เพื่อให้โหลดไฟล์ตรงจากเซิร์ฟเวอร์ ไม่ผ่าน SW อีกต่อไป
+      const allClients = await self.clients.matchAll({ type: "window" });
+      allClients.forEach((client) => client.navigate(client.url));
+    })()
   );
 });
+
+// ไม่ดัก fetch ใดๆ อีกต่อไป — ปล่อยให้ทุก request วิ่งตรงไปเซิร์ฟเวอร์ตามปกติ
