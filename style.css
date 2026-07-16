@@ -1197,7 +1197,17 @@ body {
   color: var(--accent-color);
 }
 .bottom-nav-item:active { opacity: .6; }
-
+body:not(.role-admin) tbody .btn-warning,
+body:not(.role-admin) tbody .btn-danger,
+body:not(.role-admin) tbody .btn-outline-danger,
+body:not(.role-admin) tbody .btn-outline-warning {
+  display: none !important;
+}
+ 
+/* role pks = ดูอย่างเดียว ซ่อนฟอร์มเพิ่มข้อมูลทั้งหมด */
+body.role-pks form {
+  display: none !important;
+}
 /* ปิด top bar / bottom nav บนจอ desktop */
 @media (min-width: 768px) {
   .mobile-topbar, .mobile-bottom-nav { display: none !important; }
