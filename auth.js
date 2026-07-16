@@ -7,16 +7,13 @@
  *   pks-...  -> role "pks"    (ดู/อ่านได้อย่างเดียว)
  * ⚠️ ต้องโหลดไฟล์นี้ "หลัง" supabase-api.js เสมอ (ใช้ getTableData/insertRow ร่วมกัน)
  */
-
 const SESSION_KEY = "pkgtfc_session";
-
 // ---------- Helper: hash รหัสผ่านด้วย SHA-256 (Web Crypto API, ไม่ต้องใช้ library) ----------
 async function sha256(text) {
   const enc = new TextEncoder().encode(text);
   const buf = await crypto.subtle.digest("SHA-256", enc);
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
-
 // ---------- ตรวจจับ role จากคำนำหน้าชื่อผู้ใช้ ----------
 function deriveRole(username) {
   const u = String(username || "").trim().toLowerCase();
@@ -25,7 +22,6 @@ function deriveRole(username) {
   if (u.startsWith("pks-")) return "pks";
   return null;
 }
-
 // ---------- สมัครสมาชิก (อนุมัติอัตโนมัติ) ----------
 async function signUp(username, password) {
   username = String(username || "").trim();
@@ -36,12 +32,10 @@ async function signUp(username, password) {
   if (!password || password.length < 4) {
     return { success: false, message: "รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร" };
   }
-
   const existing = await getTableData("app_users", "select=id&username=eq." + encodeURIComponent(username));
   if (existing && !existing.error && existing.length > 0) {
     return { success: false, message: "มีชื่อผู้ใช้นี้อยู่แล้ว กรุณาเลือกชื่ออื่น" };
   }
-
   const password_hash = await sha256(password);
   const result = await insertRow("app_users", { username, password_hash, role });
   if (result && result.error) {
@@ -49,7 +43,6 @@ async function signUp(username, password) {
   }
   return { success: true, message: "สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ", role };
 }
-
 // ---------- เข้าสู่ระบบ ----------
 async function logIn(username, password) {
   username = String(username || "").trim();
@@ -66,13 +59,11 @@ async function logIn(username, password) {
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
   return { success: true, session };
 }
-
 // ---------- ออกจากระบบ ----------
 function logOut() {
   localStorage.removeItem(SESSION_KEY);
   window.location.reload();
 }
-
 // ---------- อ่าน session ปัจจุบัน ----------
 function getSession() {
   try {
@@ -82,19 +73,17 @@ function getSession() {
     return null;
   }
 }
-
 // ---------- ปรับ UI ตาม role ----------
 function applyRoleUI(session) {
   document.body.classList.remove("role-admin", "role-ply", "role-pks");
   document.body.classList.add("role-" + session.role);
-
+  const roleLabel = { admin: "ผู้ดูแลระบบ", ply: "เพิ่มข้อมูล", pks: "ดูอย่างเดียว" }[session.role] || session.role;
+  const badgeText = session.username + " (" + roleLabel + ")";
   const badge = document.getElementById("session-user-badge");
-  if (badge) {
-    const roleLabel = { admin: "ผู้ดูแลระบบ", ply: "เพิ่มข้อมูล", pks: "ดูอย่างเดียว" }[session.role] || session.role;
-    badge.textContent = session.username + " (" + roleLabel + ")";
-  }
+  if (badge) badge.textContent = badgeText;
+  const badgeMobile = document.getElementById("session-user-badge-mobile");
+  if (badgeMobile) badgeMobile.textContent = badgeText;
 }
-
 // ---------- แสดง/ซ่อนหน้าจอ login ----------
 function showAuthScreen(show) {
   const overlay = document.getElementById("authOverlay");
@@ -102,7 +91,6 @@ function showAuthScreen(show) {
   if (overlay) overlay.style.display = show ? "flex" : "none";
   if (appRoot) appRoot.style.display = show ? "none" : "";
 }
-
 // ---------- ผูก event ปุ่มในหน้า login/สมัครสมาชิก ----------
 function wireAuthForms() {
   const loginForm = document.getElementById("loginForm");
@@ -121,7 +109,6 @@ function wireAuthForms() {
     document.getElementById("loginBox").style.display = "block";
     authMsg.textContent = "";
   });
-
   if (loginForm) loginForm.addEventListener("submit", async function (e) {
     e.preventDefault();
     authMsg.style.color = "#334155";
@@ -138,7 +125,6 @@ function wireAuthForms() {
       authMsg.textContent = "❌ " + res.message;
     }
   });
-
   if (signupForm) signupForm.addEventListener("submit", async function (e) {
     e.preventDefault();
     authMsg.style.color = "#334155";
@@ -160,7 +146,6 @@ function wireAuthForms() {
     }
   });
 }
-
 // ---------- เริ่มทำงานตอนโหลดหน้า ----------
 document.addEventListener("DOMContentLoaded", function () {
   wireAuthForms();
@@ -174,4 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) logoutBtn.addEventListener("click", logOut);
+
+  const logoutBtnMobile = document.getElementById("logoutBtnMobile");
+  if (logoutBtnMobile) logoutBtnMobile.addEventListener("click", logOut);
 });
