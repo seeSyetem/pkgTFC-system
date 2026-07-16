@@ -483,14 +483,14 @@ function refreshDashboard() {
       if(document.getElementById('d-p24')) document.getElementById('d-p24').innerText = (res.pack24 || 0).toLocaleString();
       if(document.getElementById('d-orders')) document.getElementById('d-orders').innerText = (res.totalOrders || 0).toLocaleString();
 
-      // 🔍 Debug: แสดง error/สถานะการดึงข้อมูลจริงบนหน้าเว็บ (ลบออกได้เมื่อแก้เสร็จแล้ว)
+      /* 🔍 Debug: แสดง error/สถานะการดึงข้อมูลจริงบนหน้าเว็บ (ลบออกได้เมื่อแก้เสร็จแล้ว)
       const dbgBox = document.getElementById('d-debug');
       if (dbgBox && res._debug) {
         dbgBox.innerHTML = res._debug.map(function(line) {
           const isError = line.indexOf('ERROR') !== -1;
           return '<div style="color:' + (isError ? '#dc2626' : '#16a34a') + '">' + line + '</div>';
         }).join('');
-      }
+      }*/
       
       // 🎯 2. เพิ่มระบบคำนวณ %Yield อัตโนมัติจากค่าในโมเดล res
       const yieldElement = document.getElementById('d-yield');
