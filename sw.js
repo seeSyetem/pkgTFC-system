@@ -1,5 +1,5 @@
 // sw.js — cache เฉพาะ shell ของแอป (ไม่ cache ข้อมูล Supabase)
-const CACHE_NAME = "packing-app-shell-v1";
+const CACHE_NAME = "packing-app-shell-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
