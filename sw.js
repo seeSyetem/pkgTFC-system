@@ -1,35 +1,27 @@
-// sw.js — เวอร์ชันนี้ทำหน้าที่ "ปลดระวาง" Service Worker เดิมทั้งหมด
-// เพื่อกำจัดปัญหาหน้าเว็บโหลดจาก cache เก่าค้าง (v3 เดิมที่ทำ cache-first)
-// เมื่อไฟล์นี้ถูกติดตั้งแทนที่ตัวเก่า มันจะ:
-//   1. ลบ cache เก่าทุกตัวทิ้ง
-//   2. ยกเลิกการลงทะเบียนตัวเอง (unregister)
-//   3. บังคับให้ทุกหน้าเว็บที่เปิดอยู่ (clients) โหลดใหม่ครั้งเดียว
-//      เพื่อให้หลุดจากการควบคุมของ Service Worker ไปตลอด
+// sw.js — เวอร์ชันทำลายตัวเอง (kill switch)
+// เนื่องจากตัว cache-first เดิมทำให้เกิดปัญหาหน้าเว็บว่าง/ค้างซ้ำๆ
+// sw.js ตัวนี้จะ: ลบ cache เก่าทั้งหมด -> unregister ตัวเอง -> สั่งให้ทุกหน้าที่เปิดอยู่ reload
+// ผลคือหลังจากนี้เว็บจะโหลดจาก network ตรงๆ ทุกครั้ง ไม่มี service worker คอย intercept อีกต่อไป
 
 self.addEventListener("install", (event) => {
-  // ข้ามขั้นตอนรอ ให้ตัวใหม่นี้ทำงานทันที แทนที่ตัวเก่า
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
-      // 1) ลบ cache ทั้งหมดที่เคยสร้างไว้
+      // ลบ cache ทั้งหมดที่เคยสร้างไว้ (ทุกเวอร์ชัน)
       const keys = await caches.keys();
       await Promise.all(keys.map((key) => caches.delete(key)));
 
-      // 2) เข้าคุมทุกหน้าเว็บที่เปิดอยู่ชั่วคราว (จำเป็นต้องทำก่อน unregister)
-      await self.clients.claim();
-
-      // 3) ยกเลิกการลงทะเบียนตัวเอง — จากนี้ไปเบราว์เซอร์จะไม่มี SW คุมหน้าเว็บนี้อีก
+      // unregister ตัวเอง
       await self.registration.unregister();
 
-      // 4) สั่งให้ทุกแท็บที่เปิดเว็บนี้อยู่ reload ใหม่หนึ่งครั้ง
-      //    เพื่อให้โหลดไฟล์ตรงจากเซิร์ฟเวอร์ ไม่ผ่าน SW อีกต่อไป
-      const allClients = await self.clients.matchAll({ type: "window" });
-      allClients.forEach((client) => client.navigate(client.url));
+      // สั่งให้ client (แท็บที่เปิดอยู่) reload เพื่อโหลดหน้าใหม่แบบไม่มี SW
+      const clientsList = await self.clients.matchAll({ type: "window" });
+      clientsList.forEach((client) => client.navigate(client.url));
     })()
   );
 });
 
-// ไม่ดัก fetch ใดๆ อีกต่อไป — ปล่อยให้ทุก request วิ่งตรงไปเซิร์ฟเวอร์ตามปกติ
+// ไม่ต้อง intercept fetch ใดๆ ทั้งสิ้น ปล่อยให้ network จัดการตามปกติ
