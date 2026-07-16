@@ -27,71 +27,12 @@ if (typeof ChartDataLabels !== 'undefined') {
     Chart.register(ChartDataLabels);
 }
 </script>
+<!-- เดิมคือ <?!= include('css'); ?> (Apps Script templating) เปลี่ยนเป็น link ธรรมดา -->
+<!-- ⚠️ นำเนื้อหาไฟล์ css.html เดิมมาวางในไฟล์ style.css แล้วอัปโหลดคู่กันไปที่ Netlify -->
 <link rel="stylesheet" href="style.css">
-<style>
-.table-scroll-wrap {
-  overflow-x: auto !important;
-  -webkit-overflow-scrolling: touch;
-}
-.table-scroll-wrap table {
-  min-width: 600px; /* กันไม่ให้คอลัมน์บีบตัวจนอ่านไม่ออก บังคับให้ scroll แทน */
-}
-</style>
 </head>
 <body>
-<!-- ===== วางส่วนนี้ทันทีหลัง <body> ===== -->
-<div id="authOverlay" style="display:flex; position:fixed; inset:0; z-index:9999; background:#0f172a; align-items:center; justify-content:center; font-family:'Kanit',sans-serif;">
-  <div style="width:100%; max-width:380px; background:#fff; border-radius:16px; padding:32px 28px; box-shadow:0 20px 50px rgba(0,0,0,.3);">
-    <div style="text-align:center; margin-bottom:20px;">
-      <i class="fas fa-boxes-stacked" style="font-size:32px; color:#2563eb;"></i>
-      <h5 style="margin-top:8px; font-weight:600;">PACKING SYSTEM</h5>
-    </div>
 
-    <div id="loginBox">
-      <form id="loginForm">
-        <div class="mb-3">
-          <label class="form-label">ชื่อผู้ใช้</label>
-          <input type="text" id="loginUsername" class="form-control" required autocomplete="username">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">รหัสผ่าน</label>
-          <input type="password" id="loginPassword" class="form-control" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn btn-primary w-100">เข้าสู่ระบบ</button>
-      </form>
-      <div class="text-center mt-3">
-        <a href="#" id="showSignupBtn" style="font-size:14px;">ยังไม่มีบัญชี? สมัครสมาชิก</a>
-      </div>
-    </div>
-
-    <div id="signupBox" style="display:none;">
-      <form id="signupForm">
-        <div class="mb-3">
-          <label class="form-label">ชื่อผู้ใช้</label>
-          <input type="text" id="signupUsername" class="form-control" placeholder="เช่น ply-03, pks-04" required>
-          <div class="form-text">ต้องขึ้นต้นด้วย admin, ply- หรือ pks- เท่านั้น</div>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">รหัสผ่าน</label>
-          <input type="password" id="signupPassword" class="form-control" required minlength="4">
-        </div>
-        <button type="submit" class="btn btn-success w-100">สมัครสมาชิก</button>
-      </form>
-      <div class="text-center mt-3">
-        <a href="#" id="showLoginBtn" style="font-size:14px;">มีบัญชีแล้ว? เข้าสู่ระบบ</a>
-      </div>
-    </div>
-
-    <div id="authMessage" style="margin-top:14px; font-size:14px; text-align:center;"></div>
-  </div>
-</div>
-<!-- ===== จบส่วน login overlay ===== -->
-
-<!-- ⚠️ ต่อไปนี้คือเนื้อหาเว็บเดิมทั้งหมด (mobile-topbar, offcanvas, container-fluid, ฯลฯ)
-     ให้ครอบทั้งหมดด้วย <div id="appRoot"> ... </div> คือ:
-     1. เพิ่ม <div id="appRoot" style="display:none;"> ต่อจากส่วน login overlay ด้านบน
-     2. ปิด </div> ตรงก่อน </body> (หลังบรรทัด <script>...setActiveBottomNav...</script>)
--->
 <!-- ===== Mobile top bar (แสดงเฉพาะจอมือถือ) ===== -->
 <div class="mobile-topbar d-flex d-md-none align-items-center justify-content-between">
   <div class="mobile-topbar-brand">
@@ -101,7 +42,6 @@ if (typeof ChartDataLabels !== 'undefined') {
   <button class="mobile-menu-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu">
     <i class="fas fa-bars"></i>
   </button>
-           
 </div>
 
 <!-- ===== Offcanvas full menu (เมนูเต็มสำหรับมือถือ) ===== -->
@@ -155,14 +95,6 @@ if (typeof ChartDataLabels !== 'undefined') {
       <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-po" data-bs-dismiss="offcanvas">
         <i class="fas fa-file-invoice-dollar me-2"></i> PO Customer
       </button>
-       <!-- ===== วางตรงไหนก็ได้ที่มองเห็นง่าย เช่น ในแถบ brand-panel หรือ mobile-topbar ===== -->
-          <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#fff;">
-            <i class="fas fa-user-circle"></i>
-            <span id="session-user-badge">-</span>
-            <button id="logoutBtn" class="btn btn-sm btn-outline-light ms-2" style="padding:2px 10px;">
-              <i class="fas fa-right-from-bracket"></i> ออกจากระบบ
-            </button>
-          </div>
     </div>
   </div>
 </div>
@@ -208,6 +140,13 @@ if (typeof ChartDataLabels !== 'undefined') {
                     <i class="fas fa-circle"></i>
                     Version 2.0 (Supabase)
                   </div>
+                  <div class="brand-divider"></div>
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:13px; color:#e2e8f0;">
+                    <span><i class="fas fa-user-circle me-1"></i><span id="session-user-badge">-</span></span>
+                    <button id="logoutBtn" class="btn btn-sm btn-outline-light" style="padding:2px 10px;">
+                      <i class="fas fa-right-from-bracket"></i>
+                    </button>
+                  </div>
                 </div>
               <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
                 <p class="nav-group-title">ภาพรวม</p>
@@ -252,7 +191,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-po" id="btn-tab-po">
                   <i class="fas fa-file-invoice-dollar me-2"></i> PO Customer
                 </button>
-                
+              
               </div>
             </div>
 
@@ -514,7 +453,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                                   </div>
                                 </div>
 
-                        <div class="po-kpi po-kpi-primary table-scroll-wrap">
+                        <div class="po-kpi po-kpi-primary">
                           <table class="table table-hover mb-0" id="po-table">
                             <thead>
                               <tr>
@@ -553,7 +492,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-primary px-4" onclick="handleSave('Summary')">บันทึกข้อมูล</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่</th><th>ผลิตภัณฑ์</th><th>Order</th><th>จำนวนขวด</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Summary"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่</th><th>ผลิตภัณฑ์</th><th>Order</th><th>จำนวนขวด</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Summary"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-p6">
@@ -592,7 +531,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                               <i class="fas fa-rotate-left"></i>
                             </button>
                           </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Pack6"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Pack6"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-p24">
@@ -626,7 +565,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                               <i class="fas fa-rotate-left"></i>
                             </button>
                       </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Pack24"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Pack24"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-btl">
@@ -648,7 +587,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-primary" onclick="handleSave('Bottles')">บันทึกข้อมูล</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Bottles"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Bottles"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-pkg">
@@ -689,7 +628,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                   </div>
                 </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>ประเภทบรรจุภัณฑ์</th><th>รายการย่อย</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Packaging_Stock"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>ประเภทบรรจุภัณฑ์</th><th>รายการย่อย</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Packaging_Stock"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-wip-p">
@@ -711,7 +650,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-primary" onclick="handleSave('WIP_Product')">บันทึกข้อมูล WIP</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead>
                 <tr>
                   <th>ID</th>
                   <th>วันที่ผลิต</th>
@@ -750,7 +689,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-primary" onclick="handleSave('WIP_Packaging')">บันทึก WIP บรรจุภัณฑ์</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>ประเภทบรรจุภัณฑ์</th><th>รายการ</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-WIP_Packaging"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>ประเภทบรรจุภัณฑ์</th><th>รายการ</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-WIP_Packaging"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-waste">
@@ -786,7 +725,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-danger px-4" onclick="handleSave('Waste')">บันทึกข้อมูลของเสีย</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>หัวข้อหลัก</th><th>สาเหตุ</th><th>ผลิตภัณฑ์</th><th>Order</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Waste"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>หัวข้อหลัก</th><th>สาเหตุ</th><th>ผลิตภัณฑ์</th><th>Order</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Waste"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-rd">
@@ -811,7 +750,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-primary px-4" onclick="handleSave('RD_Sample')">บันทึกตัวอย่าง R&D</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table">
+           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table">
                      <thead>
                           <tr>
                             <th>ID</th>
@@ -854,7 +793,7 @@ if (typeof ChartDataLabels !== 'undefined') {
              </form>
            </div>
            <div class="card p-3">
-                    <div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table">
+                    <div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table">
                         <thead>
                           <tr><th>ID</th><th>Brand</th><th>PO</th><th>ผลิตภัณฑ์</th><th>ยอดรวม (Tray)</th><th>TfcCode</th><th class="text-center">Actions</th></tr>
                         </thead>
@@ -873,7 +812,6 @@ if (typeof ChartDataLabels !== 'undefined') {
 <!-- เดิมคือ <?!= include('script'); ?> เปลี่ยนเป็น script tag ตรงๆ -->
 <!-- ⚠️ ต้องโหลด supabase-api.js ก่อน script.js เสมอ (ลำดับสำคัญ) -->
 <script src="supabase-api.js"></script>
-<script src="auth.js"></script> 
 <script src="script.js"></script>
 <script>
 // ปุ่ม bottom nav ให้ active ตามที่กด (sync กับ desktop sidebar ด้วย)
@@ -891,6 +829,7 @@ document.addEventListener('shown.bs.tab', function (e) {
     el.classList.toggle('active', el.getAttribute('data-bs-target') === targetId);
   });
 });
+
 // ลงทะเบียน Service Worker เพื่อให้ติดตั้งเป็น PWA และเปิดได้แบบ offline-shell
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
@@ -899,17 +838,6 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
-  document.addEventListener('DOMContentLoaded', function () {
-  const mobileMenuEl = document.getElementById('mobileMenu');
-  if (mobileMenuEl) {
-    mobileMenuEl.querySelectorAll('.nav-link').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        const instance = bootstrap.Offcanvas.getInstance(mobileMenuEl) || new bootstrap.Offcanvas(mobileMenuEl);
-        instance.hide();
-      });
-    });
-  }
-});
 </script>
 </body>
 </html>
