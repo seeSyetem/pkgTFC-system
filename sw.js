@@ -44,9 +44,17 @@ self.addEventListener("fetch", (event) => {
     caches.match(event.request).then((cached) => {
       const fetchPromise = fetch(event.request)
         .then((networkResponse) => {
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, networkResponse.clone());
-          });
+          // clone ทันทีก่อนทำอะไรอื่น กัน error "body already used"
+          let responseClone;
+          try {
+            responseClone = networkResponse.clone();
+          } catch (err) {
+            console.warn("SW: clone response failed", err);
+            return networkResponse;
+          }
+          caches.open(CACHE_NAME)
+            .then((cache) => cache.put(event.request, responseClone))
+            .catch((err) => console.warn("SW: cache put failed", err));
           return networkResponse;
         })
         .catch(() => cached);
