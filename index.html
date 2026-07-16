@@ -890,12 +890,17 @@ document.addEventListener('shown.bs.tab', function (e) {
   });
 });
 
-// 🧹 ยกเลิก Service Worker เก่าที่เคยลงทะเบียนไว้ (จากเวอร์ชันก่อนหน้า) และล้าง cache ทิ้งทั้งหมด
+// 🧹 บังคับเช็คอัปเดต Service Worker ทันที เพื่อให้ตัวใหม่ (ที่ล้างตัวเองทิ้ง) เข้ามาแทนตัวเก่า
+// sw.js เวอร์ชันใหม่จะลบ cache ทั้งหมด, unregister ตัวเอง, แล้ว reload หน้าเว็บให้อัตโนมัติ
+// (โค้ดนี้ทำหน้าที่ครั้งเดียวเพื่อกำจัด SW เก่า จากนั้นสามารถลบทิ้งได้ในอนาคต)
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(function (registrations) {
-    registrations.forEach(function (registration) {
-      registration.unregister();
-    });
+    if (registrations.length > 0) {
+      // มี SW เก่าลงทะเบียนอยู่ -> register sw.js ใหม่ทับ เพื่อ trigger ให้เช็คอัปเดตทันที
+      navigator.serviceWorker.register('sw.js').catch(function (err) {
+        console.warn('SW update check failed:', err);
+      });
+    }
   });
 }
 if (window.caches && caches.keys) {
