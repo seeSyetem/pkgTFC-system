@@ -1203,38 +1203,6 @@ body:not(.role-admin) tbody .btn-outline-danger,
 body:not(.role-admin) tbody .btn-outline-warning {
   display: none !important;
 }
-/*--------------------------------------*/
- .btn-login {
-    width: 100%;
-    height: 55px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
-    color: #fff;
-    font-size: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
-}
-.btn-login:hover {
-    background: linear-gradient(135deg, #1d4ed8, #2563eb);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
-}
-.btn-login:active {
-    transform: scale(0.98);
-}
-.btn-login:focus {
-    outline: none;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
-}
-.btn-login:disabled {
-    background: #94a3b8;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-/*--------------------------------------*/
 /* role pks = ดูอย่างเดียว ซ่อนฟอร์มเพิ่มข้อมูลทั้งหมด */
 body.role-pks form {
   display: none !important;
