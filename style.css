@@ -1,4 +1,3 @@
-<style>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap');
 
 :root {
@@ -1065,4 +1064,131 @@ body {
 .card-header small{
   color:#64748b;
 }
-</style>
+
+/* ============================================================
+   Mobile App Shell — Top bar / Offcanvas / Bottom nav
+   ============================================================ */
+
+/* กันเนื้อหาโดน top bar / bottom nav บัง เฉพาะจอมือถือ */
+@media (max-width: 767.98px) {
+  body {
+    padding-top: calc(56px + env(safe-area-inset-top));
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+  .container-fluid { padding-left: 12px; padding-right: 12px; }
+  .col-md-9.col-xl-10.p-4 { padding: 1rem !important; }
+}
+
+/* --- Top bar --- */
+.mobile-topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1030;
+  height: 56px;
+  padding: 0 14px;
+  padding-top: env(safe-area-inset-top);
+  background: var(--sidebar-bg);
+  box-shadow: 0 2px 10px rgba(0,0,0,.15);
+}
+.mobile-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-weight: 600;
+  font-size: .95rem;
+  letter-spacing: .3px;
+}
+.mobile-topbar-brand .brand-logo {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+  color: #fff;
+  font-size: .95rem;
+  flex-shrink: 0;
+}
+.mobile-menu-btn {
+  border: none;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.mobile-menu-btn:active { background: rgba(255,255,255,.18); }
+
+/* --- Offcanvas menu (theme เข้ากับ sidebar เดิม) --- */
+.mobile-offcanvas {
+  width: 280px;
+  background: var(--sidebar-bg);
+  color: #fff;
+}
+.mobile-offcanvas .offcanvas-header {
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  padding: 16px 16px 14px;
+}
+.mobile-offcanvas .nav-group-title {
+  color: rgba(255,255,255,.45);
+  text-transform: uppercase;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  padding: 14px 18px 6px;
+  margin: 0;
+}
+.mobile-offcanvas .nav-link {
+  color: rgba(255,255,255,.85);
+  padding: 11px 18px;
+  border-radius: 0;
+  font-size: .92rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+.mobile-offcanvas .nav-link:hover {
+  background: var(--sidebar-hover);
+  color: #fff;
+}
+.mobile-offcanvas .nav-link.active {
+  background: linear-gradient(90deg, rgba(79,70,229,.35), rgba(6,182,212,.15));
+  color: #fff;
+  border-left: 3px solid var(--accent-color);
+  padding-left: 15px;
+}
+
+/* --- Bottom nav --- */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 1030;
+  background: #fff;
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -2px 14px rgba(15,23,42,.08);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.bottom-nav-item {
+  flex: 1;
+  border: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 2px 7px;
+  color: var(--text-muted);
+  font-size: .68rem;
+  font-weight: 500;
+}
+.bottom-nav-item i { font-size: 1.05rem; }
+.bottom-nav-item.active {
+  color: var(--accent-color);
+}
+.bottom-nav-item:active { opacity: .6; }
+
+/* ปิด top bar / bottom nav บนจอ desktop */
+@media (min-width: 768px) {
+  .mobile-topbar, .mobile-bottom-nav { display: none !important; }
+}
