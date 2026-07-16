@@ -39,7 +39,59 @@ if (typeof ChartDataLabels !== 'undefined') {
 </style>
 </head>
 <body>
+<!-- ===== วางส่วนนี้ทันทีหลัง <body> ===== -->
+<div id="authOverlay" style="display:flex; position:fixed; inset:0; z-index:9999; background:#0f172a; align-items:center; justify-content:center; font-family:'Kanit',sans-serif;">
+  <div style="width:100%; max-width:380px; background:#fff; border-radius:16px; padding:32px 28px; box-shadow:0 20px 50px rgba(0,0,0,.3);">
+    <div style="text-align:center; margin-bottom:20px;">
+      <i class="fas fa-boxes-stacked" style="font-size:32px; color:#2563eb;"></i>
+      <h5 style="margin-top:8px; font-weight:600;">PACKING SYSTEM</h5>
+    </div>
 
+    <div id="loginBox">
+      <form id="loginForm">
+        <div class="mb-3">
+          <label class="form-label">ชื่อผู้ใช้</label>
+          <input type="text" id="loginUsername" class="form-control" required autocomplete="username">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">รหัสผ่าน</label>
+          <input type="password" id="loginPassword" class="form-control" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary w-100">เข้าสู่ระบบ</button>
+      </form>
+      <div class="text-center mt-3">
+        <a href="#" id="showSignupBtn" style="font-size:14px;">ยังไม่มีบัญชี? สมัครสมาชิก</a>
+      </div>
+    </div>
+
+    <div id="signupBox" style="display:none;">
+      <form id="signupForm">
+        <div class="mb-3">
+          <label class="form-label">ชื่อผู้ใช้</label>
+          <input type="text" id="signupUsername" class="form-control" placeholder="เช่น ply-03, pks-04" required>
+          <div class="form-text">ต้องขึ้นต้นด้วย admin, ply- หรือ pks- เท่านั้น</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">รหัสผ่าน</label>
+          <input type="password" id="signupPassword" class="form-control" required minlength="4">
+        </div>
+        <button type="submit" class="btn btn-success w-100">สมัครสมาชิก</button>
+      </form>
+      <div class="text-center mt-3">
+        <a href="#" id="showLoginBtn" style="font-size:14px;">มีบัญชีแล้ว? เข้าสู่ระบบ</a>
+      </div>
+    </div>
+
+    <div id="authMessage" style="margin-top:14px; font-size:14px; text-align:center;"></div>
+  </div>
+</div>
+<!-- ===== จบส่วน login overlay ===== -->
+
+<!-- ⚠️ ต่อไปนี้คือเนื้อหาเว็บเดิมทั้งหมด (mobile-topbar, offcanvas, container-fluid, ฯลฯ)
+     ให้ครอบทั้งหมดด้วย <div id="appRoot"> ... </div> คือ:
+     1. เพิ่ม <div id="appRoot" style="display:none;"> ต่อจากส่วน login overlay ด้านบน
+     2. ปิด </div> ตรงก่อน </body> (หลังบรรทัด <script>...setActiveBottomNav...</script>)
+-->
 <!-- ===== Mobile top bar (แสดงเฉพาะจอมือถือ) ===== -->
 <div class="mobile-topbar d-flex d-md-none align-items-center justify-content-between">
   <div class="mobile-topbar-brand">
