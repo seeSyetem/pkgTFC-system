@@ -1,5 +1,5 @@
 // sw.js — cache เฉพาะ shell ของแอป (ไม่ cache ข้อมูล Supabase)
-const CACHE_NAME = "packing-app-shell-v2";
+const CACHE_NAME = "packing-app-shell-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -37,6 +37,26 @@ self.addEventListener("fetch", (event) => {
 
   // เฉพาะ same-origin GET requests เท่านั้นที่ทำ cache-first
   if (event.request.method !== "GET" || url.origin !== self.location.origin) {
+    return;
+  }
+
+  // สำหรับหน้า HTML/navigation ใช้ network-first เสมอ กัน cache เก่า/เสียค้างซ้ำตอน refresh
+  const isNavigation =
+    event.request.mode === "navigate" ||
+    (event.request.headers.get("accept") || "").includes("text/html");
+
+  if (isNavigation) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME)
+            .then((cache) => cache.put(event.request, responseClone))
+            .catch((err) => console.warn("SW: cache put failed", err));
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request))
+    );
     return;
   }
 
