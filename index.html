@@ -30,6 +30,16 @@ if (typeof ChartDataLabels !== 'undefined') {
 <!-- เดิมคือ <?!= include('css'); ?> (Apps Script templating) เปลี่ยนเป็น link ธรรมดา -->
 <!-- ⚠️ นำเนื้อหาไฟล์ css.html เดิมมาวางในไฟล์ style.css แล้วอัปโหลดคู่กันไปที่ Netlify -->
 <link rel="stylesheet" href="style.css">
+<!-- 📱 ทำให้ตารางเลื่อนซ้าย-ขวาได้บนมือถือ เมื่อคอลัมน์เยอะเกินความกว้างจอ -->
+<style>
+.po-kpi-primary {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.po-kpi-primary table {
+  min-width: 600px; /* กันไม่ให้คอลัมน์บีบตัวจนอ่านไม่ออก บังคับให้ scroll แทน */
+}
+</style>
 </head>
 <body>
 
@@ -194,7 +204,9 @@ if (typeof ChartDataLabels !== 'undefined') {
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="m-0 fw-semibold text-secondary"><i class="fas fa-chart-pie me-2"></i>แดชบอร์ดสรุปยอดรวม</h3>
             <span class="badge bg-secondary px-3 py-2 fw-light">ข้อมูลอัปเดตแบบเรียลไทม์</span>
-          </div>       
+          </div>
+          <div id="d-debug" class="mb-3" style="font-size:.8rem; font-family:monospace;"></div>
+          
           <div class="row g-3 mb-2">
                   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-6 g-3 mb-4">
                             <div class="col">
