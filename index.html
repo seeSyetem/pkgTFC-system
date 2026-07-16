@@ -31,12 +31,15 @@ if (typeof ChartDataLabels !== 'undefined') {
 <!-- ⚠️ นำเนื้อหาไฟล์ css.html เดิมมาวางในไฟล์ style.css แล้วอัปโหลดคู่กันไปที่ Netlify -->
 <link rel="stylesheet" href="style.css">
 <!-- 📱 ทำให้ตารางเลื่อนซ้าย-ขวาได้บนมือถือ เมื่อคอลัมน์เยอะเกินความกว้างจอ -->
+<!-- ⚠️ ใช้ class ใหม่แยกต่างหาก (.table-scroll-wrap) แทนการแก้ .po-kpi-primary ตรงๆ -->
+<!-- เพราะ .po-kpi-primary ถูกใช้ร่วมกับการ์ด KPI สรุปยอดด้วย (ซึ่งต้องการ overflow:hidden ไว้เดิม) -->
+<!-- ใส่ !important เพื่อการันตีว่า overflow:hidden จาก .po-kpi ใน style.css จะไม่ทับ -->
 <style>
-.po-kpi-primary {
-  overflow-x: auto;
+.table-scroll-wrap {
+  overflow-x: auto !important;
   -webkit-overflow-scrolling: touch;
 }
-.po-kpi-primary table {
+.table-scroll-wrap table {
   min-width: 600px; /* กันไม่ให้คอลัมน์บีบตัวจนอ่านไม่ออก บังคับให้ scroll แทน */
 }
 </style>
@@ -456,7 +459,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                                   </div>
                                 </div>
 
-                        <div class="po-kpi po-kpi-primary">
+                        <div class="po-kpi po-kpi-primary table-scroll-wrap">
                           <table class="table table-hover mb-0" id="po-table">
                             <thead>
                               <tr>
@@ -495,7 +498,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-primary px-4" onclick="handleSave('Summary')">บันทึกข้อมูล</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่</th><th>ผลิตภัณฑ์</th><th>Order</th><th>จำนวนขวด</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Summary"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่</th><th>ผลิตภัณฑ์</th><th>Order</th><th>จำนวนขวด</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Summary"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-p6">
@@ -534,7 +537,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                               <i class="fas fa-rotate-left"></i>
                             </button>
                           </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Pack6"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Pack6"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-p24">
@@ -568,7 +571,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                               <i class="fas fa-rotate-left"></i>
                             </button>
                       </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Pack24"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Pack24"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-btl">
@@ -590,7 +593,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-primary" onclick="handleSave('Bottles')">บันทึกข้อมูล</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Bottles"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>วันที่ผลิต</th><th>วันที่หมดอายุ</th><th>Batch</th><th>จำนวน</th><th>ผลิตภัณฑ์</th><th>Order</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Bottles"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-pkg">
@@ -631,7 +634,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                   </div>
                 </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>ประเภทบรรจุภัณฑ์</th><th>รายการย่อย</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Packaging_Stock"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>ประเภทบรรจุภัณฑ์</th><th>รายการย่อย</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Packaging_Stock"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-wip-p">
@@ -653,7 +656,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-primary" onclick="handleSave('WIP_Product')">บันทึกข้อมูล WIP</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead>
                 <tr>
                   <th>ID</th>
                   <th>วันที่ผลิต</th>
@@ -692,7 +695,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-primary" onclick="handleSave('WIP_Packaging')">บันทึก WIP บรรจุภัณฑ์</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>ประเภทบรรจุภัณฑ์</th><th>รายการ</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-WIP_Packaging"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>ประเภทบรรจุภัณฑ์</th><th>รายการ</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-WIP_Packaging"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-waste">
@@ -728,7 +731,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-danger px-4" onclick="handleSave('Waste')">บันทึกข้อมูลของเสีย</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>หัวข้อหลัก</th><th>สาเหตุ</th><th>ผลิตภัณฑ์</th><th>Order</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Waste"></tbody></table></div></div>
+           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table"><thead><tr><th>ID</th><th>หัวข้อหลัก</th><th>สาเหตุ</th><th>ผลิตภัณฑ์</th><th>Order</th><th>จำนวน</th><th>วันที่</th><th class="text-center">Actions</th></tr></thead><tbody id="t-Waste"></tbody></table></div></div>
         </div>
 
         <div class="tab-pane fade" id="tab-rd">
@@ -753,7 +756,7 @@ if (typeof ChartDataLabels !== 'undefined') {
                 <div class="col-12 mt-4"><button type="button" class="btn btn-primary px-4" onclick="handleSave('RD_Sample')">บันทึกตัวอย่าง R&D</button></div>
              </form>
            </div>
-           <div class="card p-3"><div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table">
+           <div class="card p-3"><div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table">
                      <thead>
                           <tr>
                             <th>ID</th>
@@ -796,7 +799,7 @@ if (typeof ChartDataLabels !== 'undefined') {
              </form>
            </div>
            <div class="card p-3">
-                    <div class="po-kpi po-kpi-primary"><table class="table table-hover mb-0" id="po-table">
+                    <div class="po-kpi po-kpi-primary table-scroll-wrap"><table class="table table-hover mb-0" id="po-table">
                         <thead>
                           <tr><th>ID</th><th>Brand</th><th>PO</th><th>ผลิตภัณฑ์</th><th>ยอดรวม (Tray)</th><th>TfcCode</th><th class="text-center">Actions</th></tr>
                         </thead>
