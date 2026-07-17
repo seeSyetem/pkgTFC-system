@@ -214,7 +214,6 @@ BackendAPI.getPOSummaryReport = async function() {
     return [];
   }
 };
-    }
 BackendAPI.getPackagingData = async function() {
   try {
     const data = await getTableData("packaging_master");
