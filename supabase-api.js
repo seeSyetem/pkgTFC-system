@@ -80,27 +80,10 @@ function insertRow(table, rowObject) {
 function updateRow(table, query, rowObject) {
   return supabaseRequest(table, "PATCH", { query: query, payload: rowObject });
 }
-/*function deleteRow(table, query) {
+function deleteRow(table, query) {
   return supabaseRequest(table, "DELETE", { query: query });
-}*/
-async function deleteRow(table, query) {
-
-  console.log("DELETE TABLE:", table);
-  console.log("DELETE QUERY:", query);
-
-  const result = await supabaseRequest(
-    table,
-    "DELETE",
-    {
-      query: query,
-      prefer:"return=representation"
-    }
-  );
-
-  console.log("DELETE SUPABASE RESULT:", result);
-
-  return result;
 }
+
 // ==========================================
 // 2. ฟังก์ชัน Backend (พอร์ตมาจาก Code.gs ทุกตัว)
 // ==========================================
