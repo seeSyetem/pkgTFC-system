@@ -151,33 +151,32 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
       return { success: true, message: "✏️ แก้ไขข้อมูลสำเร็จ" };
     }
     else if (action === "DELETE" && rowIndex) {
-    let idValue = rowIndex;
-    if (typeof idValue === "string" && idValue.includes("=eq.")) {
-        idValue = idValue.split("=eq.")[1];
+  let idValue = rowIndex;
+  if (typeof idValue === "string" && idValue.includes("=eq.")) {
+    idValue = idValue.split("=eq.")[1];
+  }
+  const filter = `${cfg.idField}=eq.${idValue}`;
+  console.log("DELETE FILTER:", filter);
+  const result = await supabaseRequest(
+    tableName,
+    "DELETE",
+    {
+      query: filter,
+      prefer: "return=representation"
     }
-    const filter = `${cfg.idField}=eq.${idValue}`;
-    console.log("DELETE FILTER:", filter);
-    const deleteresult = await deleteRow(
-        tableName,
-        filter
-    );
-    console.log("DELETE RESULT:", deleteresult);
-    if (deleteresult && deleteresult.error) {
-        return {
-            success:false,
-            message:"Error: " + deleteresult.message
-        };
-    }
-   return {
-        success:true,
-        message:"🗑️ ลบข้อมูลสำเร็จ"};
-    }
-  } catch (err) {
-    console.error("manageInventoryAndItems error:", err);
+  );
+  console.log("DIRECT DELETE RESULT:", result);
+  if (result && result.error) {
     return {
       success:false,
-      message: err.message
+      message:"Error: " + result.message
     };
+  }
+  return {
+    success:true,
+    message:"🗑️ ลบข้อมูลสำเร็จ"
+  };
+  }
   }
 };
 BackendAPI.getSheetRawData = async function(sheetName) {
