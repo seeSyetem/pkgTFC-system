@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap');
+
 :root {
   --primary-dark: #0f172a;
   --sidebar-bg:   #1e293b;
@@ -9,6 +10,7 @@
   --text-main:    #334155;
   --text-muted:   #64748b;
   --border-color: #e2e8f0;
+
   /* สีสถานะ ใช้ร่วมกันทั้งระบบ (metric card, badge, alert) */
   --success-color:  #16a34a;
   --success-light:  #dcfce7;
@@ -18,6 +20,7 @@
   --warning-light:  #fef3c7;
   --info-color:     #2563eb;
   --info-light:     #dbeafe;
+
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -35,6 +38,7 @@
     --bg-deep-2:#141b24;
     --ok-green:#1f6b45;
 }
+
 body {
   background-color: var(--bg-body);
   font-family: 'kanit', sans-serif;
@@ -54,6 +58,7 @@ body {
       repeating-linear-gradient(135deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 26px),
       linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-deep-2) 100%);
   }
+ 
   .label-card{
     position:relative;
     width:100%; max-width:390px;
@@ -72,6 +77,7 @@ body {
   }
   .label-card::before{ top:-1px; }
   .label-card::after{ bottom:-1px; transform:rotate(180deg); }
+ 
   .label-head{
     padding:22px 26px 14px;
     border-bottom:2px dashed var(--line);
@@ -88,6 +94,7 @@ body {
     display:flex; align-items:flex-end; gap:2px; height:22px;
   }
   .barcode span{ display:block; width:2px; background:var(--ink); }
+ 
   .brand-row{ display:flex; align-items:center; gap:12px; }
   .brand-icon{
     width:44px; height:44px; border-radius:8px;
@@ -104,6 +111,7 @@ body {
     display:block; font-weight:300; font-size:11.5px; color:var(--ink-soft);
     font-family:'JetBrains Mono',monospace; letter-spacing:.04em; margin-top:2px;
   }
+ 
   .tab-row{
     display:flex; margin:16px 26px 0; background:var(--paper-shadow);
     border-radius:8px; padding:4px; gap:4px;
@@ -115,7 +123,9 @@ body {
   }
   .tab-btn.active{ background:var(--paper); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.15); }
   .tab-btn.active.signup-tab{ color:var(--ok-green); }
-  .label-body{ padding:22px 26px 26px; } 
+ 
+  .label-body{ padding:22px 26px 26px; }
+ 
   .field{ margin-bottom:16px; }
   .field label{
     display:block; font-size:12px; font-weight:500; color:var(--ink-soft);
@@ -131,7 +141,8 @@ body {
     outline:none; border-color:var(--stamp-blue);
     box-shadow:0 0 0 3px rgba(37,67,107,.15);
   }
-  .field .hint{ font-size:11px; color:var(--ink-soft); margin-top:5px; font-family:'JetBrains Mono',monospace; } 
+  .field .hint{ font-size:11px; color:var(--ink-soft); margin-top:5px; font-family:'JetBrains Mono',monospace; }
+ 
   .btn-stamp{
     width:100%; border:none; border-radius:7px; padding:11px 0;
     font-family:'Kanit',sans-serif; font-weight:600; font-size:15px; letter-spacing:.02em;
@@ -140,13 +151,13 @@ body {
   }
   .btn-stamp:active{ transform:translateY(2px); box-shadow:none !important; }
   .btn-login{ background:var(--stamp-blue); box-shadow:0 4px 0 #16283f; }
-  .btn-signup{ background:var(--ok-green); box-shadow:0 4px 0 #143f2a; } 
+  .btn-signup{ background:var(--ok-green); box-shadow:0 4px 0 #143f2a; }
+ 
   .switch-line{ text-align:center; margin-top:16px; font-size:13px; color:var(--ink-soft); }
   .switch-line a{ color:var(--tape); font-weight:500; text-decoration:none; }
   .switch-line a:hover{ text-decoration:underline; }
+ 
   #authMessage{ margin-top:14px; font-size:13.5px; text-align:center; font-weight:500; }
-/*------------login web------------------------------------------------------------------------------------*/
-
 /* Reset จาก CMMS CSS */
 #v-pills-tab .nav-link {
   background-color: transparent !important;
