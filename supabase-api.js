@@ -481,11 +481,7 @@ function buildRowObject(cfg, rowData) {
   });
   return obj;
 }
-window.google = {
-  script: {
-    run: makeRunner(null, null)
-  }
-};
+
   
 async function deleteRow(tableName, filter) {
     const url = `${SUPABASE_URL}/rest/v1/${tableName}?${filter}`;
@@ -512,3 +508,8 @@ async function deleteRow(tableName, filter) {
         data:text ? JSON.parse(text) : []
     };
 }
+window.google = {
+  script: {
+    run: makeRunner(null, null)
+  }
+};
