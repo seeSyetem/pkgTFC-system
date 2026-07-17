@@ -346,36 +346,71 @@ BackendAPI.getPOList = async function() {
     })
     .map(r => ({ po: String(r["PO"]).trim(), brand: String(r["Brand"] || "") }));
 };
-
 BackendAPI.getLatestProduction = async function() {
-  /*const data = await getTableData("summary");*/
-  console.log("Summary Data:", data);
-  if (!data || data.error || data.length === 0) return { date: "-", bottles: 0 };
+  try {
+    const data = await getTableData(
+      "summary",
+      "select=*"
+    );
+    console.log("Summary Data:", data);
+    if (!data || data.error || data.length === 0) {
+      return {
+        date: "-",
+        bottles: 0
+     };
+    }
+    let latestDate = null;
+    data.forEach(row => {
+      if (!row["วันที่"]) return;
+      const d = new Date(row["วันที่"]);
+      if (!latestDate || d > latestDate) {
+        latestDate = d;
+      }
+    });
+    if (!latestDate) {
+      return {
+        date:"-",
+        bottles:0
+      };
 
-  let latestDate = null;
-  data.forEach(row => {
-    if (!row["วันที่"]) return;
-    const d = new Date(row["วันที่"]);
-    if (!latestDate || d > latestDate) latestDate = d;
-  });
-  if (!latestDate) return { date: "-", bottles: 0 };
-
-  const y = latestDate.getFullYear();
-  const m = String(latestDate.getMonth() + 1).padStart(2, "0");
-  const d2 = String(latestDate.getDate()).padStart(2, "0");
-  const latestStr = `${y}-${m}-${d2}`;
-
-  let total = 0;
-  data.forEach(row => {
-    if (!row["วันที่"]) return;
-    const dt = new Date(row["วันที่"]);
-    const key = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
-    if (key === latestStr) total += Number(row["จำนวนขวดที่รับมา"]) || 0;
-  });
-
-  return { date: `${d2}/${m}/${y}`, bottles: total };
+    }
+    const y = latestDate.getFullYear();
+    const m = String(
+      latestDate.getMonth()+1
+    ).padStart(2,"0");
+    const d2 = String(
+      latestDate.getDate()
+    ).padStart(2,"0");
+    const latestKey =
+      `${y}-${m}-${d2}`;
+    let total = 0;
+    data.forEach(row=>{
+      if(!row["วันที่"]) return;
+      const dt = new Date(row["วันที่"]);
+      const key =
+      `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
+      if(key === latestKey){
+        total += Number(
+          row["จำนวนขวดที่รับมา"]
+        ) || 0;
+      }
+    });
+    return {
+      date:`${d2}/${m}/${y}`,
+      bottles:total
+    };
+  }
+  catch(error){
+    console.error(
+      "getLatestProduction error:",
+      error
+    );
+    return {
+      date:"-",
+      bottles:0
+    };
+  }
 };
-
 BackendAPI.getProduction7Days = async function() {
   const data = await getTableData("summary");
   if (!data || data.error) return [];
