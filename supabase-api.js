@@ -129,7 +129,7 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
       return { success: true, message: "✏️ แก้ไขข้อมูลสำเร็จ" };
     }
     else if (action === "DELETE" && rowIndex) {
-             async function deleteRow(tableName, filter) {
+async function deleteRow(tableName, filter) {
   const url = `${SUPABASE_URL}/rest/v1/${tableName}?${filter}`;
   console.log("DELETE URL:", url);
   const response = await fetch(url, {
@@ -217,7 +217,7 @@ BackendAPI.getPOSummaryReport = async function() {
     return [];
   }
 };
-
+    }
 BackendAPI.getPackagingData = async function() {
   try {
     const data = await getTableData("packaging_master");
