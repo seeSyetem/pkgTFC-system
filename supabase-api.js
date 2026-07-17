@@ -130,14 +130,7 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
       return { success: true, message: "✅ บันทึกข้อมูลสำเร็จ" };
     }
     else if (action === "EDIT" && rowIndex) {
-   /*const obj = buildRowObject(cfg, rowData);
-      const updateresult = await updateRow(
-          tableName,
-          cfg.idField + "=eq." + rowIndex,
-          obj
-      );      
-      const obj = {};*/
-      const obj = {};
+       const obj = {};
       cfg.columns.forEach((col, i) => {
         if (col === cfg.idField) return;
         obj[col] = rowData[i];
@@ -176,8 +169,18 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
     success:true,
     message:"🗑️ ลบข้อมูลสำเร็จ"
   };
-  }
-  }
+ }
+}
+  catch(err){
+            console.error(
+              "manageInventoryAndItems error:",
+              err
+            );
+            return {
+              success:false,
+              message:err.message
+            };
+   }
 };
 BackendAPI.getSheetRawData = async function(sheetName) {
   const tableName = resolveTableName(sheetName);
