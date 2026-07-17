@@ -487,3 +487,29 @@ window.google = {
     run: makeRunner(null, null)
   }
 };
+  
+async function deleteRow(tableName, filter) {
+    const url = `${SUPABASE_URL}/rest/v1/${tableName}?${filter}`;
+    console.log("DELETE URL:", url);
+    const response = await fetch(url,{
+        method:"DELETE",
+        headers:{
+            apikey:SUPABASE_KEY,
+            Authorization:`Bearer ${SUPABASE_KEY}`,
+            Prefer:"return=representation"
+        }
+    });
+    console.log("DELETE STATUS:", response.status);
+    const text = await response.text();
+    console.log("DELETE RAW RESPONSE:", text);
+    if(!response.ok){
+        return {
+            error:true,
+            message:text
+        };
+    }
+    return {
+        success:true,
+        data:text ? JSON.parse(text) : []
+    };
+}
