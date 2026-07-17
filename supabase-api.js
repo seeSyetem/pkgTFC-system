@@ -98,6 +98,12 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
     if (action === "ADD") {
      const obj = buildRowObject(cfg, rowData);
      const result = await insertRow(tableName, obj);
+     /* const obj = {};
+            cfg.columns.forEach((col, i) => {
+              if (col === cfg.idField) return;
+              obj[col] = rowData[i];
+            });
+            const result = await insertRow(tableName, obj);*/
       if (result && result.error) return { success: false, message: "Error: " + result.message };
       return { success: true, message: "✅ บันทึกข้อมูลสำเร็จ" };
     }
@@ -108,7 +114,12 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
           cfg.idField + "=eq." + rowIndex,
           obj
       );      
-      const result = await updateRow(tableName, cfg.idField + "=eq." + rowIndex, obj);
+      const obj = {};
+      /*cfg.columns.forEach((col, i) => {
+        if (col === cfg.idField) return;
+        obj[col] = rowData[i];
+      });
+      const result = await updateRow(tableName, cfg.idField + "=eq." + rowIndex, obj);*/
       if (result && result.error) return { success: false, message: "Error: " + result.message };
       return { success: true, message: "✏️ แก้ไขข้อมูลสำเร็จ" };
     }
