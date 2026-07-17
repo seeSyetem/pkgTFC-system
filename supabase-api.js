@@ -129,10 +129,25 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
       return { success: true, message: "✏️ แก้ไขข้อมูลสำเร็จ" };
     }
     else if (action === "DELETE" && rowIndex) {
-      const deleteresult = await deleteRow(tableName, cfg.idField + "=eq." + rowIndex);
-      if (deleteresult && deleteresult.error) return { success: false, message: "Error: " + deleteresult.message };
-      return { success: true, message: "🗑️ ลบข้อมูลสำเร็จ" };
-    }
+                console.log("DELETE TABLE:", tableName);
+                console.log("DELETE ID:", rowIndex);
+                console.log("FILTER:", cfg.idField + "=eq." + rowIndex);
+                const deleteresult = await deleteRow(
+                  tableName,
+                  cfg.idField + "=eq." + rowIndex
+                );
+                console.log("DELETE RESULT:", deleteresult);
+                if (deleteresult && deleteresult.error) {
+                  return {
+                    success:false,
+                    message:"Error: " + deleteresult.message
+                  };
+                }
+                return {
+                  success:true,
+                  message:"🗑️ ลบข้อมูลสำเร็จ"
+                };
+              }
     return { success: false, message: "คำสั่งไม่ถูกต้อง" };
   } catch (e) {
     return { success: false, message: "Error: " + e.toString() };
