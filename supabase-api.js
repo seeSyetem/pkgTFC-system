@@ -150,6 +150,8 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
         success:true,
         message:"🗑️ ลบข้อมูลสำเร็จ"
     };
+   }
+  }
 }
 BackendAPI.getSheetRawData = async function(sheetName) {
   const tableName = resolveTableName(sheetName);
