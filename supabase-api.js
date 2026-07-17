@@ -129,31 +129,32 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
       return { success: true, message: "✏️ แก้ไขข้อมูลสำเร็จ" };
     }
     else if (action === "DELETE" && rowIndex) {
-async function deleteRow(tableName, filter) {
-  const url = `${SUPABASE_URL}/rest/v1/${tableName}?${filter}`;
-  console.log("DELETE URL:", url);
-  const response = await fetch(url, {
-    method: "DELETE",
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      Prefer: "return=representation"
-    }
-  });
-  console.log("DELETE STATUS:", response.status);
-  const text = await response.text();
-  console.log("DELETE RAW RESPONSE:", text);
-  if (!response.ok) {
-    return {
-      error: true,
-      message: text
-    };
-  }
-  return {
-    success: true,
-    data: text ? JSON.parse(text) : []
-  };
-}
+            async function deleteRow(tableName, filter) {
+              const url = `${SUPABASE_URL}/rest/v1/${tableName}?${filter}`;
+              console.log("DELETE URL:", url);
+              const response = await fetch(url, {
+                method: "DELETE",
+                headers: {
+                  apikey: SUPABASE_KEY,
+                  Authorization: `Bearer ${SUPABASE_KEY}`,
+                  Prefer: "return=representation"
+                }
+              });
+              console.log("DELETE STATUS:", response.status);
+              const text = await response.text();
+              console.log("DELETE RAW RESPONSE:", text);
+              if (!response.ok) {
+                return {
+                  error: true,
+                  message: text
+                };
+              }
+              return {
+                success: true,
+                data: text ? JSON.parse(text) : []
+              };
+            }
+            }
 BackendAPI.getSheetRawData = async function(sheetName) {
   const tableName = resolveTableName(sheetName);
   const cfg = TABLE_CONFIG[tableName];
