@@ -1171,3 +1171,30 @@ if(avgEl){
   });
 }
 //--------------------------------
+// เชื่อมปุ่มแท็บใหม่เข้ากับ logic เดิม (showSignupBtn / showLoginBtn)
+  // และซิงค์สถานะแท็บให้ตรงกับกล่องฟอร์มที่แสดงอยู่
+  const loginBox = document.getElementById('loginBox');
+  const signupBox = document.getElementById('signupBox');
+  const tabLogin = document.getElementById('tabLoginBtn');
+  const tabSignup = document.getElementById('tabSignupBtn');
+ 
+  function showLogin(){
+    loginBox.style.display = '';
+    signupBox.style.display = 'none';
+    tabLogin.classList.add('active');
+    tabSignup.classList.remove('active');
+  }
+  function showSignup(){
+    loginBox.style.display = 'none';
+    signupBox.style.display = '';
+    tabSignup.classList.add('active');
+    tabLogin.classList.remove('active');
+  }
+ 
+  document.getElementById('showSignupBtn').addEventListener('click', e => { e.preventDefault(); showSignup(); });
+  document.getElementById('showLoginBtn').addEventListener('click', e => { e.preventDefault(); showLogin(); });
+  tabLogin.addEventListener('click', showLogin);
+  tabSignup.addEventListener('click', showSignup);
+ 
+  // หมายเหตุ: ให้เก็บ logic เดิมของฟอร์ม (loginForm / signupForm submit handlers,
+  // การเชื่อม backend, validation ฯลฯ) ไว้ตามเดิม โค้ดนี้แก้แค่ดีไซน์/โครงสร้างการแสดงผล
