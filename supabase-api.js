@@ -68,7 +68,7 @@ async function supabaseRequest(table, method, options) {
     console.error("Supabase error [" + table + "] [" + res.status + "]: " + text);
     return { error: true, status: res.status, message: text };
   }
-  return text ? JSON.parse(text) : null;
+  return text ? JSON.parse(text) : {success:true};
 }
 
 function getTableData(table, query) {
