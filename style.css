@@ -26,6 +26,17 @@
   --radius-lg: 16px;
   --shadow-card: 0 2px 8px rgba(15,23,42,0.04);
   --shadow-card-hover: 0 8px 20px rgba(15,23,42,0.07);
+   --ink:#1c1917;
+    --ink-soft:#6b6459;
+    --paper:#f7f1e2;
+    --paper-shadow:#e7dcc2;
+    --tape:#e0631a;
+    --tape-dark:#b84e13;
+    --stamp-blue:#25436b;
+    --line:#d8cba9;
+    --bg-deep:#0b0f14;
+    --bg-deep-2:#141b24;
+    --ok-green:#1f6b45;
 }
 
 body {
@@ -35,6 +46,118 @@ body {
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
 }
+*{box-sizing:border-box;}
+  body{margin:0;}
+  #authOverlay{
+    display:flex; position:fixed; inset:0; z-index:9999;
+    align-items:center; justify-content:center;
+    font-family:'Kanit',sans-serif;
+    background:
+      radial-gradient(circle at 18% 20%, rgba(224,99,26,0.10), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(37,67,107,0.25), transparent 50%),
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 26px),
+      linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-deep-2) 100%);
+  }
+ 
+  .label-card{
+    position:relative;
+    width:100%; max-width:390px;
+    background:var(--paper);
+    border-radius:6px;
+    box-shadow:0 30px 60px -15px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.06);
+    overflow:hidden;
+  }
+  /* torn-edge notches top/bottom, like a label peeled off a roll */
+  .label-card::before, .label-card::after{
+    content:"";
+    position:absolute; left:0; right:0; height:14px;
+    background:
+      radial-gradient(circle 7px at 14px 0, var(--bg-deep-2) 98%, transparent 100%) repeat-x;
+    background-size:28px 14px;
+  }
+  .label-card::before{ top:-1px; }
+  .label-card::after{ bottom:-1px; transform:rotate(180deg); }
+ 
+  .label-head{
+    padding:22px 26px 14px;
+    border-bottom:2px dashed var(--line);
+    position:relative;
+  }
+  .track-row{
+    display:flex; align-items:center; justify-content:space-between;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; letter-spacing:.12em;
+    color:var(--ink-soft);
+    margin-bottom:12px;
+  }
+  .barcode{
+    display:flex; align-items:flex-end; gap:2px; height:22px;
+  }
+  .barcode span{ display:block; width:2px; background:var(--ink); }
+ 
+  .brand-row{ display:flex; align-items:center; gap:12px; }
+  .brand-icon{
+    width:44px; height:44px; border-radius:8px;
+    background:var(--stamp-blue);
+    display:flex; align-items:center; justify-content:center;
+    color:#f7f1e2; font-size:18px; flex-shrink:0;
+    box-shadow:0 3px 0 var(--tape-dark);
+  }
+  .brand-text h5{
+    margin:0; font-weight:600; font-size:17px; color:var(--ink);
+    letter-spacing:.01em;
+  }
+  .brand-text h8{
+    display:block; font-weight:300; font-size:11.5px; color:var(--ink-soft);
+    font-family:'JetBrains Mono',monospace; letter-spacing:.04em; margin-top:2px;
+  }
+ 
+  .tab-row{
+    display:flex; margin:16px 26px 0; background:var(--paper-shadow);
+    border-radius:8px; padding:4px; gap:4px;
+  }
+  .tab-btn{
+    flex:1; text-align:center; padding:9px 0; border:none; background:transparent;
+    font-family:'Kanit',sans-serif; font-size:13.5px; font-weight:500; color:var(--ink-soft);
+    border-radius:6px; cursor:pointer; transition:all .18s ease;
+  }
+  .tab-btn.active{ background:var(--paper); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.15); }
+  .tab-btn.active.signup-tab{ color:var(--ok-green); }
+ 
+  .label-body{ padding:22px 26px 26px; }
+ 
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block; font-size:12px; font-weight:500; color:var(--ink-soft);
+    margin-bottom:6px; letter-spacing:.02em;
+  }
+  .field input{
+    width:100%; padding:10px 12px; border-radius:7px;
+    border:1.5px solid var(--line); background:#fffdf8;
+    font-family:'Kanit',sans-serif; font-size:14.5px; color:var(--ink);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .field input:focus{
+    outline:none; border-color:var(--stamp-blue);
+    box-shadow:0 0 0 3px rgba(37,67,107,.15);
+  }
+  .field .hint{ font-size:11px; color:var(--ink-soft); margin-top:5px; font-family:'JetBrains Mono',monospace; }
+ 
+  .btn-stamp{
+    width:100%; border:none; border-radius:7px; padding:11px 0;
+    font-family:'Kanit',sans-serif; font-weight:600; font-size:15px; letter-spacing:.02em;
+    color:#fff; cursor:pointer; position:relative;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn-stamp:active{ transform:translateY(2px); box-shadow:none !important; }
+  .btn-login{ background:var(--stamp-blue); box-shadow:0 4px 0 #16283f; }
+  .btn-signup{ background:var(--ok-green); box-shadow:0 4px 0 #143f2a; }
+ 
+  .switch-line{ text-align:center; margin-top:16px; font-size:13px; color:var(--ink-soft); }
+  .switch-line a{ color:var(--tape); font-weight:500; text-decoration:none; }
+  .switch-line a:hover{ text-decoration:underline; }
+ 
+  #authMessage{ margin-top:14px; font-size:13.5px; text-align:center; font-weight:500; }
 /* Reset จาก CMMS CSS */
 #v-pills-tab .nav-link {
   background-color: transparent !important;
