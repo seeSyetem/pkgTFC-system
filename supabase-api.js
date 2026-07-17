@@ -146,13 +146,18 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
             message:"Error: " + deleteresult.message
         };
     }
-    return {
+   return {
         success:true,
-        message:"🗑️ ลบข้อมูลสำเร็จ"
+        message:"🗑️ ลบข้อมูลสำเร็จ"};
+    }
+  } catch (err) {
+    console.error("manageInventoryAndItems error:", err);
+    return {
+      success:false,
+      message: err.message
     };
-   }
   }
-}
+};
 BackendAPI.getSheetRawData = async function(sheetName) {
   const tableName = resolveTableName(sheetName);
   const cfg = TABLE_CONFIG[tableName];
