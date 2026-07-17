@@ -115,11 +115,16 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
           obj
       );      
       const obj = {};*/
+      const obj = {};
       cfg.columns.forEach((col, i) => {
         if (col === cfg.idField) return;
         obj[col] = rowData[i];
       });
-      const updateresult = await updateRow(tableName, cfg.idField + "=eq." + rowIndex, obj);
+      const updateresult = await updateRow(
+        tableName,
+        cfg.idField + "=eq." + rowIndex,
+        obj
+      );
       if (updateresult && updateresult.error) return { success: false, message: "Error: " + updateresult.message };
       return { success: true, message: "✏️ แก้ไขข้อมูลสำเร็จ" };
     }
