@@ -96,21 +96,18 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
     if (!cfg) return { success: false, message: "ไม่พบตาราง: " + sheetName };
 
     if (action === "ADD") {
-      const obj = {};
-      cfg.columns.forEach((col, i) => {
-        if (col === cfg.idField) return;
-        obj[col] = rowData[i];
-      });
-      const result = await insertRow(tableName, obj);
+     const obj = buildRowObject(cfg, rowData);
+     const result = await insertRow(tableName, obj);
       if (result && result.error) return { success: false, message: "Error: " + result.message };
       return { success: true, message: "✅ บันทึกข้อมูลสำเร็จ" };
     }
     else if (action === "EDIT" && rowIndex) {
-      const obj = {};
-      cfg.columns.forEach((col, i) => {
-        if (col === cfg.idField) return;
-        obj[col] = rowData[i];
-      });
+   const obj = buildRowObject(cfg, rowData);
+      const result = await updateRow(
+          tableName,
+          cfg.idField + "=eq." + rowIndex,
+          obj
+      );      
       const result = await updateRow(tableName, cfg.idField + "=eq." + rowIndex, obj);
       if (result && result.error) return { success: false, message: "Error: " + result.message };
       return { success: true, message: "✏️ แก้ไขข้อมูลสำเร็จ" };
@@ -411,7 +408,16 @@ function makeRunner(successFn, failureFn) {
     }
   });
 }
-
+function buildRowObject(cfg, rowData) {
+  const obj = {};
+  let j = 0;
+  cfg.columns.forEach(col => {
+    // ไม่ส่ง id ถ้าฐานข้อมูลสร้างเอง (IDENTITY/AUTO INCREMENT)
+    if (col === cfg.idField) return;
+    obj[col] = j < rowData.length ? rowData[j++] : null;
+  });
+  return obj;
+}
 window.google = {
   script: {
     run: makeRunner(null, null)
