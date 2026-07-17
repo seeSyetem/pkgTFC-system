@@ -154,7 +154,6 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
     data: text ? JSON.parse(text) : []
   };
 }
-    }
 BackendAPI.getSheetRawData = async function(sheetName) {
   const tableName = resolveTableName(sheetName);
   const cfg = TABLE_CONFIG[tableName];
