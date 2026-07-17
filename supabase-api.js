@@ -109,7 +109,7 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
     }
     else if (action === "EDIT" && rowIndex) {
    const obj = buildRowObject(cfg, rowData);
-      const result = await updateRow(
+      const updateresult = await updateRow(
           tableName,
           cfg.idField + "=eq." + rowIndex,
           obj
@@ -119,13 +119,13 @@ BackendAPI.manageInventoryAndItems = async function(action, sheetName, rowData, 
         if (col === cfg.idField) return;
         obj[col] = rowData[i];
       });
-      const result = await updateRow(tableName, cfg.idField + "=eq." + rowIndex, obj);*/
-      if (result && result.error) return { success: false, message: "Error: " + result.message };
+      const updateresult = await updateRow(tableName, cfg.idField + "=eq." + rowIndex, obj);*/
+      if (updateresult && updateresult.error) return { success: false, message: "Error: " + updateresult.message };
       return { success: true, message: "✏️ แก้ไขข้อมูลสำเร็จ" };
     }
     else if (action === "DELETE" && rowIndex) {
-      const result = await deleteRow(tableName, cfg.idField + "=eq." + rowIndex);
-      if (result && result.error) return { success: false, message: "Error: " + result.message };
+      const deleteresult = await deleteRow(tableName, cfg.idField + "=eq." + rowIndex);
+      if (deleteresult && deleteresult.error) return { success: false, message: "Error: " + deleteresult.message };
       return { success: true, message: "🗑️ ลบข้อมูลสำเร็จ" };
     }
     return { success: false, message: "คำสั่งไม่ถูกต้อง" };
