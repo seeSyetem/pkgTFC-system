@@ -337,6 +337,7 @@ BackendAPI.getPOList = async function() {
 };
 
 BackendAPI.getLatestProduction = async function() {
+  /*const data = await getTableData("summary");*/
   console.log("Summary Data:", data);
   if (!data || data.error || data.length === 0) return { date: "-", bottles: 0 };
 
