@@ -898,25 +898,36 @@ function getPOSummaryReport() {
           po: row["PO"],
           product: row["ผลิตภัณฑ์"],
           targetQty: parseFloat(row["ยอดรวม"]) || 0,
-          actualQty: 0
+          actualBottles: 0 // สะสมเป็น "ขวด" ก่อน แล้วค่อยแปลงเป็นถาดตอนสรุปผล
         };
       });
     }
 
-    const p24Data = getTableData("pack24");
-    if (p24Data && !p24Data.error) {
-      p24Data.forEach(row => {
-        const poNum = String(row["Order"] || "").trim();
-        const product = String(row["ผลิตภัณฑ์"] || "").trim();
-        const qty = parseFloat(row["จำนวน"]) || 0;
-        const key = poNum + "_" + product;
-        if (reportMap[key]) reportMap[key].actualQty += qty;
-      });
-    }
+    // ✅ แก้บั๊ก: เดิมรวมยอดจริงจาก pack24 อย่างเดียว ทำให้ PO ที่แพ็คผ่าน pack6 ขึ้น actual = 0 เสมอ
+    ["pack6", "pack24"].forEach(tableName => {
+      const multiplier = tableName === "pack6" ? 6 : 24; // pack6: 1 แพ็ค = 6 ขวด, pack24: 1 ถาด = 24 ขวด
+      const data = getTableData(tableName);
+      if (data && !data.error) {
+        data.forEach(row => {
+          const poNum = String(row["Order"] || "").trim();
+          const product = String(row["ผลิตภัณฑ์"] || "").trim();
+          const qty = (parseFloat(row["จำนวน"]) || 0) * multiplier;
+          const key = poNum + "_" + product;
+          if (reportMap[key]) reportMap[key].actualBottles += qty;
+        });
+      }
+    });
 
     return Object.values(reportMap).map(item => {
-      item.diffQty = item.targetQty - item.actualQty;
-      return item;
+      const actualQty = Math.floor(item.actualBottles / 24); // แปลงขวดรวม -> ถาด ให้หน่วยตรงกับ targetQty (ยอดรวม)
+      return {
+        brand: item.brand,
+        po: item.po,
+        product: item.product,
+        targetQty: item.targetQty,
+        actualQty: actualQty,
+        diffQty: item.targetQty - actualQty
+      };
     });
   } catch (err) {
     console.error("getPOSummaryReport error: " + err.message);
@@ -948,24 +959,40 @@ function getPOTrackingData() {
     const dataPack24 = getTableData("pack24");
     const pack24List = (dataPack24 && !dataPack24.error) ? dataPack24 : [];
 
+    // ✅ แก้บั๊ก: เดิมไม่ได้ดึง pack6 มารวมเลย ทำให้ PO ที่แพ็คผ่าน pack6 ขึ้น packedQty = 0 เสมอ
+    const dataPack6 = getTableData("pack6");
+    const pack6List = (dataPack6 && !dataPack6.error) ? dataPack6 : [];
+
     return dataPO.map(row => {
       const poNo = String(row["PO"] || "").trim();
       const product = String(row["ผลิตภัณฑ์"] || "").trim();
       const brand = String(row["Brand"] || "").trim();
       const orderQty = parseInt(row["ยอดรวม"]) || 0;
 
-      let totalPacked = 0;
+      const cleanPoNo = poNo.replace(/^\.+|\.+$/g, "").toLowerCase();
+      const cleanTargetProd = product.toLowerCase();
+
+      let totalBottles = 0; // สะสมเป็น "ขวด" ก่อน แล้วค่อยแปลงเป็นถาดตอนสรุปผล
+
       pack24List.forEach(pRow => {
         const packOrder = String(pRow["Order"] || "").trim().replace(/^\.+|\.+$/g, "").toLowerCase();
         const packProduct = String(pRow["ผลิตภัณฑ์"] || "").trim().toLowerCase();
-        const packQty = parseInt(pRow["จำนวน"]) || 0;
-        const cleanPoNo = poNo.replace(/^\.+|\.+$/g, "").toLowerCase();
-        const cleanTargetProd = product.toLowerCase();
-
+        const packQty = parseInt(pRow["จำนวน"]) || 0; // 1 ถาด = 24 ขวด
         if (packOrder !== "" && packOrder === cleanPoNo && packProduct === cleanTargetProd) {
-          totalPacked += packQty;
+          totalBottles += packQty * 24;
         }
       });
+
+      pack6List.forEach(pRow => {
+        const packOrder = String(pRow["Order"] || "").trim().replace(/^\.+|\.+$/g, "").toLowerCase();
+        const packProduct = String(pRow["ผลิตภัณฑ์"] || "").trim().toLowerCase();
+        const packQty = parseInt(pRow["จำนวน"]) || 0; // 1 แพ็ค = 6 ขวด
+        if (packOrder !== "" && packOrder === cleanPoNo && packProduct === cleanTargetProd) {
+          totalBottles += packQty * 6;
+        }
+      });
+
+      const totalPacked = Math.floor(totalBottles / 24); // แปลงขวดรวม -> ถาด ให้หน่วยตรงกับ orderQty (ยอดรวม)
 
       return {
         tfcCode: row["TfcCode"] || "-",
