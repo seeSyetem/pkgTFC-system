@@ -1091,13 +1091,32 @@ function getPOTrackingReport(month) {
 }
 
 // แปลงค่าวันที่ (จาก Supabase) ให้เป็นคีย์เดือนรูปแบบ "YYYY-MM" เพื่อใช้เทียบเดือน
+// รองรับทั้ง text แบบ "15/07/2026" (วัน/เดือน/ปี) และ ISO เช่น "2026-07-15"
 function getMonthKey(dateVal) {
   if (!dateVal) return "";
-  const d = new Date(dateVal);
-  if (isNaN(d.getTime())) return "";
-  const y = d.getFullYear();
-  const m = ("0" + (d.getMonth() + 1)).slice(-2);
-  return y + "-" + m;
+  const s = String(dateVal).trim();
+
+  // รูปแบบ "DD/MM/YYYY" หรือ "DD-MM-YYYY" (วัน/เดือน/ปี ที่ใช้กันทั่วไปในไทย)
+  const dmy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (dmy) {
+    const month = ("0" + dmy[2]).slice(-2);
+    return dmy[3] + "-" + month;
+  }
+
+  // รูปแบบ ISO "YYYY-MM-DD" หรือ "YYYY/MM/DD"
+  const ymd = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-]\d{1,2}/);
+  if (ymd) {
+    const month = ("0" + ymd[2]).slice(-2);
+    return ymd[1] + "-" + month;
+  }
+
+  // fallback: ให้ JS Date ลองแปลง (เช่น กรณีเป็น timestamp จริงๆ)
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) {
+    return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2);
+  }
+
+  return "";
 }
 
 // ดึงรายการเดือนทั้งหมดที่มีข้อมูลการแพ็คจริง (จาก pack6 + pack24) สำหรับ dropdown เลือกเดือน
