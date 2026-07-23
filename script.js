@@ -1,5 +1,4 @@
-
-  let mainChart = null;
+let mainChart = null;
 
  // ตัวแปรส่วนกลางสำหรับเก็บข้อมูลทั้งหมดที่ดึงมาจากหลังบ้าน Code.gs
 // ⚠️ ต้องประกาศตัวแปรรอไว้ที่บรรทัดบนสุดของแท็กสคริปต์นอกฟังก์ชันทุกตัวเสมอ!
@@ -785,17 +784,41 @@ function loadPOTracking() {
     })
     .getPOList();
 
+  // โหลดรายการเดือนที่มีข้อมูลแพ็คจริง มาใส่ dropdown (คงค่าที่เลือกไว้เดิม)
+  var selMonth = document.getElementById('po-filter-month');
+  google.script.run
+    .withSuccessHandler(function(months) {
+      if (!selMonth) return;
+      var current = selMonth.value;
+      selMonth.innerHTML = '<option value="">ทุกเดือน</option>';
+      months.forEach(function(m) {
+        selMonth.innerHTML += '<option value="' + m + '">' + formatMonthLabel(m) + '</option>';
+      });
+      selMonth.value = current;
+    })
+    .getPackMonthList();
+
+  var selectedMonth = selMonth ? selMonth.value : '';
+
   google.script.run
     .withSuccessHandler(function(data) {
      _poData = data;
-      renderPOTable(data);
-      renderTop5PO(data);
+      filterPOTable(); // ใช้ filter PO/สถานะเดิมที่ค้างอยู่ ควบคู่กับข้อมูลเดือนที่โหลดใหม่
     })
     .withFailureHandler(function(err) {
       document.getElementById('po-body').innerHTML =
         '<tr><td colspan="9" style="text-align:center;color:#dc2626;padding:20px">โหลดไม่สำเร็จ: ' + (err.message||err) + '</td></tr>';
     })
-    .getPOTrackingReport();
+    .getPOTrackingReport(selectedMonth);
+}
+
+// แปลง "YYYY-MM" เป็นข้อความเดือนภาษาไทยสั้นๆ เช่น "ก.ค. 2026"
+function formatMonthLabel(monthKey) {
+  var thMonths = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var parts = String(monthKey).split('-');
+  var y = parts[0], m = parseInt(parts[1], 10);
+  if (!y || !m) return monthKey;
+  return thMonths[m - 1] + ' ' + y;
 }
 function renderPOTable(data) {
   var tbody = document.getElementById('po-body');
@@ -859,15 +882,24 @@ function updatePOSummary(data) {
   var inprog   = data.filter(function(r) { return r[7] === 'กำลังผลิต' || r[7] === 'ใกล้ครบ'; }).length;
   var notstart = data.filter(function(r) { return r[7] === 'ยังไม่เริ่ม'; }).length;
 
+  // ✅ ผลรวม แพ็คได้จริง(TRAY) ของแถวที่กำลังแสดงอยู่ (ตามตัวกรอง PO/สถานะ/เดือนที่เลือก)
+  var totalTray = data.reduce(function(sum, r) { return sum + (parseFloat(r[4]) || 0); }, 0);
+  // สูตรที่กำหนด: แพ็คได้จริง(TRAY) × 24 = ขวดที่ได้
+  var totalBottle = totalTray * 24;
+
   var elTotal    = document.getElementById('po-total-count');
   var elDone     = document.getElementById('po-done');
   var elInprog   = document.getElementById('po-inprog');
   var elNotstart = document.getElementById('po-notstart');
+  var elTrayTotal   = document.getElementById('po-tray-total');
+  var elBottleTotal = document.getElementById('po-bottle-total');
 
   if (elTotal)    elTotal.textContent    = total;
   if (elDone)     elDone.textContent     = done;
   if (elInprog)   elInprog.textContent   = inprog;
   if (elNotstart) elNotstart.textContent = notstart;
+  if (elTrayTotal)   elTrayTotal.textContent   = totalTray.toLocaleString();
+  if (elBottleTotal) elBottleTotal.textContent = totalBottle.toLocaleString(undefined, { maximumFractionDigits: 2 });
    updateOverallProgress(data);
 }
 function loadTop5Dashboard() {
