@@ -336,7 +336,7 @@ BackendAPI.getDashboardChartData = async function() {
   }
 };
 
-BackendAPI.getPOTrackingReport = async function() {
+BackendAPI.getPOTrackingReport = async function(month) {
   try {
     const reportMap = {};
     const poData = await getTableData("po_customer");
@@ -355,6 +355,11 @@ BackendAPI.getPOTrackingReport = async function() {
       const data = await getTableData(tableName);
       if (data && !data.error) {
         data.forEach(r => {
+          // ✅ ถ้าเลือกเดือนไว้ ให้นับเฉพาะแถวที่ "วันที่ผลิต" อยู่ในเดือนนั้น
+          if (month) {
+            const rowMonth = getMonthKey(r["วันที่ผลิต"]);
+            if (rowMonth !== month) return;
+          }
           const po = String(r["Order"] || "").trim();
           const product = String(r["ผลิตภัณฑ์"] || "").trim();
           const qty = (parseFloat(r["จำนวน"]) || 0) * multiplier;
@@ -375,6 +380,55 @@ BackendAPI.getPOTrackingReport = async function() {
     });
   } catch (e) {
     console.error("getPOTrackingReport error: " + e.toString());
+    return [];
+  }
+};
+
+// แปลงค่าวันที่ (text จาก Supabase เช่น "10-07-2026" หรือ "15/07/2026" แบบ วัน-เดือน-ปี)
+// ให้เป็นคีย์เดือนรูปแบบ "YYYY-MM" เพื่อใช้เทียบเดือน
+function getMonthKey(dateVal) {
+  if (!dateVal) return "";
+  const s = String(dateVal).trim();
+
+  // รูปแบบ "DD/MM/YYYY" หรือ "DD-MM-YYYY" (วัน-เดือน-ปี ที่ใช้กันทั่วไปในไทย)
+  const dmy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (dmy) {
+    const month = ("0" + dmy[2]).slice(-2);
+    return dmy[3] + "-" + month;
+  }
+
+  // รูปแบบ ISO "YYYY-MM-DD" หรือ "YYYY/MM/DD"
+  const ymd = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-]\d{1,2}/);
+  if (ymd) {
+    const month = ("0" + ymd[2]).slice(-2);
+    return ymd[1] + "-" + month;
+  }
+
+  // fallback: ให้ JS Date ลองแปลง (เช่น กรณีเป็น timestamp จริงๆ)
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) {
+    return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2);
+  }
+
+  return "";
+}
+
+// ดึงรายการเดือนทั้งหมดที่มีข้อมูลการแพ็คจริง (จาก pack6 + pack24) สำหรับ dropdown เลือกเดือน
+BackendAPI.getPackMonthList = async function() {
+  try {
+    const months = new Set();
+    for (const tableName of ["pack6", "pack24"]) {
+      const data = await getTableData(tableName);
+      if (data && !data.error) {
+        data.forEach(r => {
+          const key = getMonthKey(r["วันที่ผลิต"]);
+          if (key) months.add(key);
+        });
+      }
+    }
+    return [...months].sort().reverse(); // เดือนล่าสุดขึ้นก่อน
+  } catch (e) {
+    console.error("getPackMonthList error: " + e.toString());
     return [];
   }
 };
