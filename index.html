@@ -475,6 +475,9 @@ if (typeof ChartDataLabels !== 'undefined') {
                                 <option value="ใกล้ครบ">🟠 ใกล้ครบ</option>
                                 <option value="ครบแล้ว">🟢 ครบแล้ว</option>
                               </select>
+                              <select id="po-filter-month" class="form-select" onchange="loadPOTracking()">
+                                <option value="">ทุกเดือน</option>
+                              </select>
                               <button class="btn-refresh"onclick="loadPOTracking()">
                                 <i class="fas fa-rotate-right"></i>
                               </button>
@@ -517,6 +520,26 @@ if (typeof ChartDataLabels !== 'undefined') {
                                         <i class="fas fa-hourglass-start"></i>
                                       </div>
                                       <div class="po-kpi-value" id="po-notstart">0</div>
+                                    </div>
+                                  </div>
+
+                                  <div class="col-12 col-md-6 col-xl-6">
+                                    <div class="po-kpi po-kpi-info">
+                                      <div class="po-kpi-header">
+                                        <span>แพ็คได้จริงรวม (TRAY)</span>
+                                        <i class="fas fa-boxes-stacked"></i>
+                                      </div>
+                                      <div class="po-kpi-value" id="po-tray-total">0</div>
+                                    </div>
+                                  </div>
+
+                                  <div class="col-12 col-md-6 col-xl-6">
+                                    <div class="po-kpi po-kpi-info">
+                                      <div class="po-kpi-header">
+                                        <span>ขวดที่ได้</span>
+                                        <i class="fas fa-bottle-water"></i>
+                                      </div>
+                                      <div class="po-kpi-value" id="po-bottle-total">0</div>
                                     </div>
                                   </div>
                                 </div>
